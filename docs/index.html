@@ -3,484 +3,384 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rephraser — Better writing, one shortcut</title>
-    <meta name="description" content="Select text, press a shortcut, get a polished version. On-device AI. No cloud, no accounts, no cost.">
+    <title>Rephraser — Rewrite anything without switching apps</title>
+    <meta name="description" content="On-device AI text rewriting for macOS. Select text, press a shortcut, done. No cloud, no API keys, no cost.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
-            --bg: #09090b;
-            --card: #111113;
-            --card-hover: #161618;
-            --border: #1e1e22;
-            --text: #ececef;
-            --muted: #71717a;
+            --bg: #0a0a0a;
+            --surface: #111;
+            --border: #1a1a1a;
+            --text: #e4e4e7;
+            --dim: #52525b;
+            --faint: #27272a;
             --accent: #3b82f6;
-            --green: #22c55e;
-            --red: #ef4444;
         }
 
         html { scroll-behavior: smooth; }
         body {
             font-family: 'Inter', -apple-system, sans-serif;
-            background: var(--bg);
-            color: var(--text);
+            background: var(--bg); color: var(--text);
             -webkit-font-smoothing: antialiased;
-            line-height: 1.6;
-            overflow-x: hidden;
         }
 
-        /* ---- Layout ---- */
-        .wrap { max-width: 1120px; margin: 0 auto; padding: 0 48px; }
-        .wrap-wide { max-width: 1280px; margin: 0 auto; padding: 0 48px; }
+        a { color: inherit; text-decoration: none; }
 
         /* ---- Nav ---- */
         nav {
-            position: fixed; top: 0; width: 100%; z-index: 99;
-            background: rgba(9,9,11,0.82); backdrop-filter: blur(16px);
+            position: fixed; top: 0; width: 100%; z-index: 100;
+            background: rgba(10,10,10,0.8); backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border);
         }
-        .nav-inner {
-            max-width: 1280px; margin: 0 auto; padding: 0 48px;
-            height: 60px; display: flex; align-items: center; justify-content: space-between;
+        .nav-c {
+            max-width: 1200px; margin: 0 auto; padding: 0 40px;
+            height: 56px; display: flex; align-items: center; justify-content: space-between;
         }
-        .nav-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-        .nav-brand .logo-mark {
-            width: 32px; height: 32px; border-radius: 8px;
-            background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 900; font-size: 16px; color: #fff; letter-spacing: -0.5px;
+        .wordmark { font-size: 15px; font-weight: 700; letter-spacing: -0.4px; }
+        .nav-r { display: flex; align-items: center; gap: 28px; }
+        .nav-r a { font-size: 13px; color: var(--dim); transition: color 0.15s; }
+        .nav-r a:hover { color: var(--text); }
+        .nav-btn {
+            font-size: 12px; font-weight: 600; padding: 6px 14px; border-radius: 6px;
+            background: var(--text); color: var(--bg); transition: opacity 0.15s;
         }
-        .nav-brand .logo-text { font-size: 16px; font-weight: 700; color: var(--text); }
-        .nav-links { display: flex; align-items: center; gap: 32px; }
-        .nav-links a {
-            color: var(--muted); text-decoration: none; font-size: 14px;
-            font-weight: 500; transition: color 0.15s;
-        }
-        .nav-links a:hover { color: var(--text); }
-        .btn-sm {
-            background: var(--text); color: var(--bg); font-size: 13px; font-weight: 600;
-            padding: 8px 18px; border-radius: 8px; text-decoration: none; transition: opacity 0.15s;
-        }
-        .btn-sm:hover { opacity: 0.85; }
+        .nav-btn:hover { opacity: 0.85; }
 
         /* ---- Hero ---- */
-        .hero { padding: 160px 0 100px; text-align: center; }
+        .hero {
+            max-width: 760px; margin: 0 auto; padding: 160px 40px 80px;
+            text-align: center;
+        }
         .hero h1 {
-            font-size: clamp(48px, 7vw, 80px);
-            font-weight: 900; letter-spacing: -3px; line-height: 1.0;
+            font-size: 52px; font-weight: 800; letter-spacing: -2.5px;
+            line-height: 1.08;
         }
-        .hero h1 .dim { color: #52525b; }
-        .hero-sub {
-            font-size: 19px; color: var(--muted); max-width: 540px;
-            margin: 24px auto 0; line-height: 1.7;
+        .hero h1 .d { color: var(--dim); }
+        .hero-privacy {
+            display: inline-block; margin-top: 20px;
+            font-size: 13px; font-weight: 500; letter-spacing: 0.02em;
+            color: var(--accent); padding: 5px 14px;
+            border: 1px solid rgba(59,130,246,0.2); border-radius: 20px;
+            background: rgba(59,130,246,0.05);
         }
-        .kbd {
-            display: inline-block; font-family: 'SF Mono', Menlo, monospace;
-            background: #18181b; border: 1px solid #27272a; border-bottom-width: 2px;
-            border-radius: 5px; padding: 2px 8px; font-size: 0.82em; color: #a1a1aa;
+        .hero p {
+            margin-top: 24px; font-size: 17px; color: var(--dim);
+            line-height: 1.7; max-width: 520px; margin-left: auto; margin-right: auto;
         }
-        .hero-actions { margin-top: 40px; display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap; }
-        .btn-hero {
+        .hero-cta { margin-top: 36px; display: flex; align-items: center; justify-content: center; gap: 16px; flex-wrap: wrap; }
+        .btn {
             display: inline-flex; align-items: center; gap: 8px;
-            background: #fff; color: #09090b; font-size: 16px; font-weight: 700;
-            padding: 14px 32px; border-radius: 12px; text-decoration: none;
-            transition: transform 0.1s, box-shadow 0.15s;
+            font-size: 15px; font-weight: 700; padding: 13px 28px; border-radius: 10px;
+            background: #fff; color: #0a0a0a; transition: transform 0.1s, box-shadow 0.15s;
         }
-        .btn-hero:hover { transform: translateY(-1px); box-shadow: 0 4px 24px rgba(255,255,255,0.08); }
-        .btn-hero svg { width: 18px; height: 18px; }
-        .hero-note { font-size: 13px; color: #52525b; margin-top: 16px; }
+        .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(255,255,255,0.06); }
+        .btn svg { width: 16px; height: 16px; }
+        .hero-meta { font-size: 12px; color: var(--faint); }
         .hero-apps {
-            margin-top: 48px; display: flex; align-items: center; justify-content: center;
-            gap: 8px; flex-wrap: wrap;
+            margin-top: 40px; display: flex; justify-content: center; gap: 6px; flex-wrap: wrap;
         }
-        .hero-app-tag {
-            font-size: 12px; color: #52525b; padding: 4px 12px;
-            border: 1px solid #1e1e22; border-radius: 6px; background: transparent;
-        }
+        .ha { font-size: 11px; color: var(--faint); padding: 3px 10px; border: 1px solid var(--border); border-radius: 5px; }
 
-        /* ---- Sections ---- */
-        section { padding: 96px 0; }
-        .section-border { border-top: 1px solid var(--border); }
-        .section-label {
-            font-size: 12px; text-transform: uppercase; letter-spacing: 0.12em;
-            color: var(--accent); font-weight: 600; margin-bottom: 12px;
-        }
-        .section-title {
-            font-size: clamp(30px, 4vw, 42px); font-weight: 800; letter-spacing: -1.5px;
-            line-height: 1.1; margin-bottom: 16px;
-        }
-        .section-desc { font-size: 16px; color: var(--muted); line-height: 1.7; max-width: 520px; }
+        /* ---- Section frames ---- */
+        .s { border-top: 1px solid var(--border); }
+        .s-inner { max-width: 1200px; margin: 0 auto; padding: 96px 40px; }
 
         /* ---- How it works ---- */
-        .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; margin-top: 48px; }
-        .step {
-            background: var(--card); padding: 40px 32px; position: relative;
-        }
-        .step:first-child { border-radius: 16px 0 0 16px; }
-        .step:last-child { border-radius: 0 16px 16px 0; }
-        .step-num {
-            font-size: 48px; font-weight: 900; color: #1e1e22;
-            position: absolute; top: 20px; right: 24px; line-height: 1;
-        }
-        .step h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
-        .step p { font-size: 14px; color: var(--muted); line-height: 1.6; }
+        .how-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border-radius: 16px; overflow: hidden; margin-top: 56px; }
+        .how-cell { background: var(--surface); padding: 48px 36px; }
+        .how-n { font-size: 11px; color: var(--faint); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 16px; }
+        .how-cell h3 { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 10px; }
+        .how-cell p { font-size: 14px; color: var(--dim); line-height: 1.65; }
 
-        /* ---- Feature grid ---- */
-        .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 48px; }
-        .feat {
-            background: var(--card); border: 1px solid var(--border); border-radius: 14px;
-            padding: 28px; transition: border-color 0.15s, background 0.15s;
+        /* ---- Features (editorial, no icons) ---- */
+        .feat-list { margin-top: 64px; }
+        .feat-row {
+            display: grid; grid-template-columns: 280px 1fr; gap: 24px;
+            padding: 28px 0; border-bottom: 1px solid var(--border);
+            align-items: baseline;
         }
-        .feat:hover { border-color: #2a2a2f; background: var(--card-hover); }
-        .feat-icon {
-            width: 40px; height: 40px; border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 18px; margin-bottom: 16px;
-            background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.12);
-        }
-        .feat h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
-        .feat p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+        .feat-row:first-child { border-top: 1px solid var(--border); }
+        .feat-row h3 { font-size: 15px; font-weight: 700; letter-spacing: -0.3px; }
+        .feat-row p { font-size: 14px; color: var(--dim); line-height: 1.65; }
 
         /* ---- Comparison ---- */
-        .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
-        .compare-table {
-            background: var(--card); border: 1px solid var(--border);
-            border-radius: 14px; overflow: hidden;
-        }
-        .crow { display: grid; grid-template-columns: 1fr 90px 90px; border-bottom: 1px solid var(--border); }
-        .crow:last-child { border-bottom: none; }
-        .crow > div { padding: 14px 18px; font-size: 14px; }
-        .crow.head > div { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 600; }
-        .crow .label { color: #a1a1aa; }
-        .crow .y { color: var(--green); text-align: center; font-weight: 600; }
-        .crow .n { color: var(--red); text-align: center; }
-        .crow .p { color: #52525b; text-align: center; font-size: 12px; }
+        .cmp-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; }
+        .cmp-text h2 { font-size: 36px; font-weight: 800; letter-spacing: -1.5px; line-height: 1.1; margin-bottom: 20px; }
+        .cmp-text p { font-size: 15px; color: var(--dim); line-height: 1.7; }
+        .tbl { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+        .tr { display: grid; grid-template-columns: 1fr 80px 80px; border-bottom: 1px solid var(--border); }
+        .tr:last-child { border-bottom: none; }
+        .tr > span { padding: 13px 18px; font-size: 13px; }
+        .tr.th > span { font-size: 11px; color: var(--dim); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+        .tr .l { color: #a1a1aa; }
+        .tr .y { color: #22c55e; text-align: center; font-weight: 600; }
+        .tr .n { color: #ef4444; text-align: center; }
+        .tr .p { color: var(--faint); text-align: center; font-size: 11px; }
 
         /* ---- Modes ---- */
-        .modes-flex { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
-        .mtag {
-            padding: 10px 20px; border-radius: 10px; font-size: 14px; font-weight: 500;
-            background: var(--card); border: 1px solid var(--border);
-        }
-        .mtag.accent { background: rgba(59,130,246,0.08); border-color: rgba(59,130,246,0.2); color: var(--accent); }
+        .modes-wrap { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 32px; }
+        .m { padding: 9px 18px; border-radius: 8px; font-size: 13px; font-weight: 500; background: var(--surface); border: 1px solid var(--border); }
+        .m.hi { background: rgba(59,130,246,0.06); border-color: rgba(59,130,246,0.18); color: var(--accent); }
 
         /* ---- Models ---- */
-        .models-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 24px; }
-        .mcard {
-            background: var(--card); border: 1px solid var(--border);
-            border-radius: 12px; padding: 20px;
-        }
-        .mcard.rec { border-color: rgba(59,130,246,0.3); }
-        .mcard h4 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
-        .mcard p { font-size: 12px; color: var(--muted); }
-        .badge {
-            display: inline-block; font-size: 10px; font-weight: 700;
-            background: rgba(59,130,246,0.15); color: var(--accent);
-            padding: 2px 8px; border-radius: 4px; margin-left: 6px; vertical-align: middle;
-        }
+        .mod-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 32px; }
+        .mc { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+        .mc.rec { border-color: rgba(59,130,246,0.25); }
+        .mc h4 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+        .mc p { font-size: 12px; color: var(--dim); }
+        .tag { font-size: 10px; font-weight: 700; background: rgba(59,130,246,0.12); color: var(--accent); padding: 2px 7px; border-radius: 4px; margin-left: 5px; vertical-align: 1px; }
 
-        /* ---- CTA ---- */
-        .final-cta { text-align: center; padding: 120px 48px; border-top: 1px solid var(--border); }
-        .final-cta h2 {
-            font-size: clamp(32px, 5vw, 48px); font-weight: 900;
-            letter-spacing: -2px; line-height: 1.05; margin-bottom: 16px;
+        /* ---- Bottom CTA ---- */
+        .bottom-cta {
+            border-top: 1px solid var(--border); text-align: center;
+            padding: 120px 40px;
         }
-        .final-cta p { font-size: 16px; color: var(--muted); margin-bottom: 32px; }
+        .bottom-cta h2 { font-size: 40px; font-weight: 800; letter-spacing: -2px; line-height: 1.08; }
+        .bottom-cta h2 .d { color: var(--dim); }
+        .bottom-cta p { font-size: 15px; color: var(--dim); margin-top: 16px; }
+        .bottom-cta .btn { margin-top: 32px; }
 
         /* ---- Footer ---- */
         footer {
-            padding: 28px 48px; border-top: 1px solid var(--border);
-            max-width: 1280px; margin: 0 auto;
+            border-top: 1px solid var(--border); padding: 24px 40px;
+            max-width: 1200px; margin: 0 auto;
             display: flex; align-items: center; justify-content: space-between;
         }
-        footer span { font-size: 13px; color: #3f3f46; }
-        footer a { color: var(--muted); text-decoration: none; font-size: 13px; transition: color 0.15s; }
+        footer span { font-size: 12px; color: var(--faint); }
+        footer .f-links { display: flex; gap: 20px; }
+        footer a { font-size: 12px; color: var(--dim); transition: color 0.15s; }
         footer a:hover { color: var(--text); }
 
         /* ---- Responsive ---- */
         @media (max-width: 900px) {
-            .wrap, .wrap-wide, .nav-inner { padding: 0 24px; }
-            .hero { padding: 120px 24px 64px; }
-            .hero h1 { font-size: 40px; letter-spacing: -1.5px; }
-            .steps { grid-template-columns: 1fr; }
-            .step { border-radius: 0; }
-            .step:first-child { border-radius: 16px 16px 0 0; }
-            .step:last-child { border-radius: 0 0 16px 16px; }
-            .features-grid { grid-template-columns: 1fr; }
-            .compare-grid { grid-template-columns: 1fr; }
-            .models-grid { grid-template-columns: 1fr 1fr; }
-            .section-title { font-size: 28px; }
-            footer { flex-direction: column; gap: 12px; text-align: center; padding: 28px 24px; }
+            .nav-c, .s-inner, footer { padding-left: 24px; padding-right: 24px; }
+            .hero { padding: 130px 24px 60px; }
+            .hero h1 { font-size: 36px; letter-spacing: -1.5px; }
+            .how-grid { grid-template-columns: 1fr; }
+            .feat-row { grid-template-columns: 1fr; gap: 4px; }
+            .cmp-layout { grid-template-columns: 1fr; }
+            .mod-grid { grid-template-columns: 1fr 1fr; }
+            .bottom-cta h2 { font-size: 30px; }
+            .bottom-cta { padding: 80px 24px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Nav -->
-    <nav>
-        <div class="nav-inner">
-            <a href="#" class="nav-brand">
-                <div class="logo-mark">R</div>
-                <span class="logo-text">Rephraser</span>
-            </a>
-            <div class="nav-links">
-                <a href="#features">Features</a>
-                <a href="#compare">vs Apple AI</a>
-                <a href="https://github.com/vatsan95/Rephraser">GitHub</a>
-                <a href="https://github.com/vatsan95/Rephraser#build--run" class="btn-sm">Get Started</a>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Hero -->
-    <div class="hero">
-        <div class="wrap">
-            <h1>
-                Rewrite anything.<br>
-                <span class="dim">Without switching apps.</span>
-            </h1>
-            <p class="hero-sub">
-                Select text in any app. Press <span class="kbd">⌥</span> <span class="kbd">⇧</span> <span class="kbd">R</span> (or set your own shortcut). Get a polished version in seconds. AI runs entirely on your Mac.
-            </p>
-            <div class="hero-actions">
-                <a href="https://github.com/vatsan95/Rephraser#build--run" class="btn-hero">
-                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
-                    Download for Mac
-                </a>
-                <span class="hero-note">macOS 14+ · Apple Silicon · Free</span>
-            </div>
-            <div class="hero-apps">
-                <span class="hero-app-tag">Slack</span>
-                <span class="hero-app-tag">Gmail</span>
-                <span class="hero-app-tag">Notion</span>
-                <span class="hero-app-tag">VS Code</span>
-                <span class="hero-app-tag">Discord</span>
-                <span class="hero-app-tag">Chrome</span>
-                <span class="hero-app-tag">Safari</span>
-                <span class="hero-app-tag">Pages</span>
-                <span class="hero-app-tag">Notes</span>
-                <span class="hero-app-tag">Any app</span>
-            </div>
+<nav>
+    <div class="nav-c">
+        <a href="#" class="wordmark">Rephraser</a>
+        <div class="nav-r">
+            <a href="#features">Features</a>
+            <a href="#compare">vs Apple AI</a>
+            <a href="https://github.com/vatsan95/Rephraser">GitHub</a>
+            <a href="https://github.com/vatsan95/Rephraser#build--run" class="nav-btn">Get Started</a>
         </div>
     </div>
+</nav>
 
-    <!-- How it works -->
-    <section class="section-border">
-        <div class="wrap-wide">
-            <div style="text-align:center;">
-                <div class="section-label">How it works</div>
-                <div class="section-title">Three steps. Two seconds.</div>
-            </div>
-            <div class="steps">
-                <div class="step">
-                    <div class="step-num">01</div>
-                    <h3>Select text</h3>
-                    <p>Highlight any text in any application on your Mac. Email, chat, docs, code — anything with a text cursor.</p>
-                </div>
-                <div class="step">
-                    <div class="step-num">02</div>
-                    <h3>Press your shortcut</h3>
-                    <p>Hit <span class="kbd">⌥⇧R</span> or whatever shortcut you've configured. A floating panel appears with your rephrased text streaming in real time.</p>
-                </div>
-                <div class="step">
-                    <div class="step-num">03</div>
-                    <h3>Accept or switch</h3>
-                    <p>Press Enter to replace your text, Escape to cancel. Switch modes or toggle the diff view to see exactly what changed before deciding.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- All features -->
-    <section id="features" class="section-border">
-        <div class="wrap-wide">
-            <div style="text-align:center;">
-                <div class="section-label">Features</div>
-                <div class="section-title">Everything you need. Nothing you don't.</div>
-            </div>
-            <div class="features-grid">
-                <div class="feat">
-                    <div class="feat-icon">🔒</div>
-                    <h3>100% On-Device AI</h3>
-                    <p>Runs via Apple MLX on your Apple Silicon chip. No servers, no cloud, no API keys. Your text never leaves your Mac.</p>
-                </div>
-                <div class="feat">
-                    <div class="feat-icon">🌐</div>
-                    <h3>Works in Every App</h3>
-                    <p>System-wide via clipboard. Slack, Gmail, Notion, VS Code, Chrome, Discord, Pages — any app where you can select text.</p>
-                </div>
-                <div class="feat">
-                    <div class="feat-icon">🧠</div>
-                    <h3>Context-Aware Modes</h3>
-                    <p>Auto-detects your app and picks the right tone. Slack gets casual, Gmail gets professional, VS Code gets grammar-only. Override anytime.</p>
-                </div>
-                <div class="feat">
-                    <div class="feat-icon">⚡</div>
-                    <h3>Real-Time Streaming</h3>
-                    <p>See results appear token-by-token as they generate. First token in under 2 seconds on M1, even faster on M3/M4.</p>
-                </div>
-                <div class="feat">
-                    <div class="feat-icon">🔀</div>
-                    <h3>Before/After Diff View</h3>
-                    <p>Toggle the diff view to see original vs rephrased side-by-side with color-coded highlighting. Know exactly what changed.</p>
-                </div>
-                <div class="feat">
-                    <div class="feat-icon">⌨️</div>
-                    <h3>Custom Keyboard Shortcut</h3>
-                    <p>Change the shortcut to anything you want in Settings. Record any key combination — Cmd, Opt, Shift, Ctrl + any key.</p>
-                </div>
-                <div class="feat">
-                    <div class="feat-icon">🎛️</div>
-                    <h3>9 Built-in Modes</h3>
-                    <p>Professional, Casual, Concise, Elaborate, Fix Grammar, Confident, Empathetic, Summarize, Key Points. Plus unlimited custom modes.</p>
-                </div>
-                <div class="feat">
-                    <div class="feat-icon">🤖</div>
-                    <h3>Choose Your AI Model</h3>
-                    <p>Download and switch between Gemma 4, Gemma 3, Qwen 3, Llama 3.2, and more — all managed inside the app. No terminal needed.</p>
-                </div>
-                <div class="feat">
-                    <div class="feat-icon">📋</div>
-                    <h3>Clipboard Preservation</h3>
-                    <p>Full clipboard snapshot and restore. Images, files, rich text — everything on your clipboard is preserved through the entire flow.</p>
-                </div>
-                <div class="feat">
-                    <div class="feat-icon">✈️</div>
-                    <h3>Works Offline</h3>
-                    <p>Once the model is downloaded, everything runs locally. No internet needed. Works on airplanes, in coffee shops, anywhere.</p>
-                </div>
-                <div class="feat">
-                    <div class="feat-icon">🔔</div>
-                    <h3>Sound Feedback</h3>
-                    <p>Optional sound plays when text is pasted back, confirming the action completed. Toggle on/off in Settings.</p>
-                </div>
-                <div class="feat">
-                    <div class="feat-icon">🚀</div>
-                    <h3>Launch at Login</h3>
-                    <p>Set it once, forget it. Rephraser starts automatically when you log in and lives quietly in your menu bar until you need it.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- vs Apple Intelligence -->
-    <section id="compare" class="section-border">
-        <div class="wrap">
-            <div class="compare-grid">
-                <div>
-                    <div class="section-label">The comparison</div>
-                    <div class="section-title">Why not just use Apple Intelligence?</div>
-                    <p class="section-desc">
-                        Apple's Writing Tools are limited to 3 fixed tones, route complex requests through cloud servers, fail in WhatsApp and web editors, and are completely unavailable in China and were delayed for months in the EU.
-                    </p>
-                    <p class="section-desc" style="margin-top: 16px;">
-                        Rephraser gives you 9 modes, custom prompts, model choice, context-aware suggestions, diff view, and works in literally every app — all 100% on your device.
-                    </p>
-                </div>
-                <div class="compare-table">
-                    <div class="crow head">
-                        <div></div>
-                        <div style="text-align:center">Rephraser</div>
-                        <div style="text-align:center">Apple AI</div>
-                    </div>
-                    <div class="crow"><div class="label">Works in every app</div><div class="y">✓</div><div class="n">✗</div></div>
-                    <div class="crow"><div class="label">100% on-device</div><div class="y">✓</div><div class="n">✗</div></div>
-                    <div class="crow"><div class="label">Available worldwide</div><div class="y">✓</div><div class="n">✗</div></div>
-                    <div class="crow"><div class="label">9 modes + custom</div><div class="y">✓</div><div class="p">3 fixed</div></div>
-                    <div class="crow"><div class="label">Choose AI model</div><div class="y">✓</div><div class="n">✗</div></div>
-                    <div class="crow"><div class="label">Context-aware</div><div class="y">✓</div><div class="n">✗</div></div>
-                    <div class="crow"><div class="label">Diff view</div><div class="y">✓</div><div class="n">✗</div></div>
-                    <div class="crow"><div class="label">Custom shortcut</div><div class="y">✓</div><div class="n">✗</div></div>
-                    <div class="crow"><div class="label">Open source</div><div class="y">✓</div><div class="n">✗</div></div>
-                    <div class="crow"><div class="label">Works offline</div><div class="y">✓</div><div class="p">Partial</div></div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Modes -->
-    <section class="section-border">
-        <div class="wrap">
-            <div class="section-label">Writing modes</div>
-            <div class="section-title">9 modes. Unlimited custom ones.</div>
-            <p class="section-desc">Apple gives you Friendly, Professional, and Concise. That's it. Rephraser ships with 9 modes — and you can write your own system prompts for anything else.</p>
-            <div class="modes-flex" style="margin-top: 32px;">
-                <span class="mtag">Professional</span>
-                <span class="mtag">Casual</span>
-                <span class="mtag">Concise</span>
-                <span class="mtag">Elaborate</span>
-                <span class="mtag">Fix Grammar</span>
-                <span class="mtag">Confident</span>
-                <span class="mtag">Empathetic</span>
-                <span class="mtag">Summarize</span>
-                <span class="mtag">Key Points</span>
-                <span class="mtag accent">+ Your custom modes</span>
-            </div>
-        </div>
-    </section>
-
-    <!-- Models -->
-    <section class="section-border">
-        <div class="wrap">
-            <div class="section-label">AI Models</div>
-            <div class="section-title">Pick your model. Or just use the default.</div>
-            <p class="section-desc">Gemma 4 downloads automatically on first launch. Want something smaller or faster? Switch anytime. All managed inside the app — no terminal, no Homebrew, no Ollama.</p>
-            <div class="models-grid">
-                <div class="mcard rec">
-                    <h4>Gemma 4 E4B <span class="badge">Default</span></h4>
-                    <p>Google's latest · Best quality · ~3 GB</p>
-                </div>
-                <div class="mcard">
-                    <h4>Gemma 3 4B</h4>
-                    <p>Proven and fast · ~2.5 GB</p>
-                </div>
-                <div class="mcard">
-                    <h4>Qwen 3 4B</h4>
-                    <p>Strong multilingual · ~2.5 GB</p>
-                </div>
-                <div class="mcard">
-                    <h4>Llama 3.2 3B</h4>
-                    <p>Smallest and fastest · ~1.8 GB</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Privacy -->
-    <section class="section-border">
-        <div class="wrap" style="text-align:center; max-width: 640px;">
-            <div class="section-label">Privacy</div>
-            <div class="section-title">Your text never leaves your Mac.</div>
-            <p style="font-size: 16px; color: var(--muted); line-height: 1.8; margin-top: 16px;">
-                No server calls. No cloud processing. No accounts. No telemetry.
-                AI runs directly on your Apple Silicon chip via MLX.
-                Your clipboard is always restored. We can't read your text because we literally never see it.
-            </p>
-        </div>
-    </section>
-
-    <!-- CTA -->
-    <div class="final-cta">
-        <h2>Stop tab-switching<br>to fix your writing.</h2>
-        <p>One shortcut. Nine modes. Diff view. Context-aware. Fully private. Runs on your Mac.</p>
-        <a href="https://github.com/vatsan95/Rephraser#build--run" class="btn-hero" style="margin: 0 auto;">
-            <svg viewBox="0 0 24 24" fill="currentColor" style="width:18px;height:18px;"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+<!-- Hero -->
+<div class="hero">
+    <div class="hero-privacy">Your text never leaves your Mac</div>
+    <h1>Rewrite anything.<br><span class="d">Without switching apps.</span></h1>
+    <p>Select text anywhere on your Mac, press a shortcut, get a better version in seconds. AI runs entirely on your device — no cloud, no API keys, no accounts.</p>
+    <div class="hero-cta">
+        <a href="https://github.com/vatsan95/Rephraser#build--run" class="btn">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
             Download for Mac
         </a>
-        <div class="hero-note" style="margin-top: 20px;">macOS 14 (Sonoma) · Apple Silicon (M1+) · ~3 GB for AI model</div>
+        <span class="hero-meta">macOS 14+ · Apple Silicon · Free</span>
     </div>
+    <div class="hero-apps">
+        <span class="ha">Slack</span>
+        <span class="ha">Gmail</span>
+        <span class="ha">Notion</span>
+        <span class="ha">VS Code</span>
+        <span class="ha">Discord</span>
+        <span class="ha">Chrome</span>
+        <span class="ha">Safari</span>
+        <span class="ha">Pages</span>
+        <span class="ha">Notes</span>
+        <span class="ha">Any app</span>
+    </div>
+</div>
 
-    <!-- Footer -->
-    <footer>
-        <span>Rephraser · Made for macOS</span>
-        <div style="display: flex; gap: 24px;">
-            <a href="https://github.com/vatsan95/Rephraser">GitHub</a>
-            <a href="https://github.com/vatsan95/Rephraser/issues">Feedback</a>
+<!-- How it works -->
+<div class="s">
+    <div class="s-inner" style="text-align:center;">
+        <h2 style="font-size:36px; font-weight:800; letter-spacing:-1.5px;">Three steps. Two seconds.</h2>
+        <p style="font-size:15px; color:var(--dim); margin-top:12px;">No menus, no context switching, no copy-pasting into ChatGPT.</p>
+        <div class="how-grid">
+            <div class="how-cell">
+                <div class="how-n">Step 01</div>
+                <h3>Select text</h3>
+                <p>Highlight text in any application. Email, Slack, a Google Doc, your IDE — anywhere with a text cursor.</p>
+            </div>
+            <div class="how-cell">
+                <div class="how-n">Step 02</div>
+                <h3>Press your shortcut</h3>
+                <p>Hit ⌥⇧R (or whatever you've set). A floating panel appears and your rephrased text streams in real time.</p>
+            </div>
+            <div class="how-cell">
+                <div class="how-n">Step 03</div>
+                <h3>Accept or switch</h3>
+                <p>Enter to replace, Escape to cancel. Change modes or toggle diff view to see exactly what changed before deciding.</p>
+            </div>
         </div>
-    </footer>
+    </div>
+</div>
+
+<!-- Features -->
+<div class="s" id="features">
+    <div class="s-inner">
+        <h2 style="font-size:36px; font-weight:800; letter-spacing:-1.5px;">Built for people who write all day.</h2>
+        <p style="font-size:15px; color:var(--dim); margin-top:12px; max-width:560px;">Every feature exists because switching to ChatGPT for a two-sentence rewrite is absurd.</p>
+
+        <div class="feat-list">
+            <div class="feat-row">
+                <h3>On-device AI</h3>
+                <p>Runs via Apple MLX directly on your Apple Silicon chip. No servers, no cloud, no API keys. Your text never leaves your machine. Not even for a millisecond.</p>
+            </div>
+            <div class="feat-row">
+                <h3>Works in every app</h3>
+                <p>System-wide via clipboard capture. Slack, Gmail, Notion, VS Code, Chrome, Discord, Pages, Notes — any app where you can select text. No plugins or extensions needed.</p>
+            </div>
+            <div class="feat-row">
+                <h3>Context-aware modes</h3>
+                <p>Automatically picks the right tone based on your app. Slack gets casual, Gmail gets professional, VS Code gets grammar-only. Override with one click in the panel.</p>
+            </div>
+            <div class="feat-row">
+                <h3>Real-time streaming</h3>
+                <p>Results appear token-by-token as they generate. First token in under 2 seconds on M1, faster on newer chips. A "Generating..." indicator keeps you informed.</p>
+            </div>
+            <div class="feat-row">
+                <h3>Before / after diff view</h3>
+                <p>Toggle the diff view in the panel to see your original text alongside the rephrased version with color-coded highlighting. Know exactly what changed before accepting.</p>
+            </div>
+            <div class="feat-row">
+                <h3>9 built-in modes + custom</h3>
+                <p>Professional, Casual, Concise, Elaborate, Fix Grammar, Confident, Empathetic, Summarize, Key Points. Create unlimited custom modes with your own system prompts.</p>
+            </div>
+            <div class="feat-row">
+                <h3>Custom keyboard shortcut</h3>
+                <p>Change the shortcut to any key combination in Settings. Record Cmd, Option, Shift, Ctrl + any key. Reset to default with one click.</p>
+            </div>
+            <div class="feat-row">
+                <h3>Choose your AI model</h3>
+                <p>Download and switch between Gemma 4, Gemma 3, Qwen 3, Phi-4, and Llama 3.2 — all managed inside the app. No terminal, no Homebrew, no Ollama setup.</p>
+            </div>
+            <div class="feat-row">
+                <h3>Full clipboard preservation</h3>
+                <p>Saves and restores your entire clipboard — images, files, rich text, everything — through the whole rephrase flow. Nothing gets lost.</p>
+            </div>
+            <div class="feat-row">
+                <h3>Works completely offline</h3>
+                <p>Once the model is downloaded, zero internet needed. Airplanes, coffee shops, VPN tunnels — works anywhere your Mac works.</p>
+            </div>
+            <div class="feat-row">
+                <h3>30-second timeout safety</h3>
+                <p>If the model hangs or takes too long, inference is automatically cancelled with a clear error and retry option. No frozen UI.</p>
+            </div>
+            <div class="feat-row">
+                <h3>Launch at login + sound feedback</h3>
+                <p>Starts automatically and lives in your menu bar. Optional sound confirms when text is pasted back. Toggle both in Settings.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Compare -->
+<div class="s" id="compare">
+    <div class="s-inner">
+        <div class="cmp-layout">
+            <div class="cmp-text">
+                <h2>Why not Apple Intelligence?</h2>
+                <p>Apple's Writing Tools give you 3 fixed tones, route complex requests through cloud servers, fail in WhatsApp and web editors, and are blocked in China.</p>
+                <p style="margin-top:16px;">Rephraser gives you 9 modes, custom prompts, model choice, context-aware suggestions, diff view, and works in every app. All on your device.</p>
+            </div>
+            <div class="tbl">
+                <div class="tr th"><span></span><span style="text-align:center">Rephraser</span><span style="text-align:center">Apple AI</span></div>
+                <div class="tr"><span class="l">Works in every app</span><span class="y">&#10003;</span><span class="n">&#10007;</span></div>
+                <div class="tr"><span class="l">100% on-device</span><span class="y">&#10003;</span><span class="n">&#10007;</span></div>
+                <div class="tr"><span class="l">Available worldwide</span><span class="y">&#10003;</span><span class="n">&#10007;</span></div>
+                <div class="tr"><span class="l">9 modes + custom</span><span class="y">&#10003;</span><span class="p">3 fixed</span></div>
+                <div class="tr"><span class="l">Choose AI model</span><span class="y">&#10003;</span><span class="n">&#10007;</span></div>
+                <div class="tr"><span class="l">Context-aware</span><span class="y">&#10003;</span><span class="n">&#10007;</span></div>
+                <div class="tr"><span class="l">Diff view</span><span class="y">&#10003;</span><span class="n">&#10007;</span></div>
+                <div class="tr"><span class="l">Custom shortcut</span><span class="y">&#10003;</span><span class="n">&#10007;</span></div>
+                <div class="tr"><span class="l">Works offline</span><span class="y">&#10003;</span><span class="p">Partial</span></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modes -->
+<div class="s">
+    <div class="s-inner">
+        <h2 style="font-size:36px; font-weight:800; letter-spacing:-1.5px;">9 modes. Unlimited custom ones.</h2>
+        <p style="font-size:15px; color:var(--dim); margin-top:12px; max-width:520px;">Apple gives you Friendly, Professional, and Concise. Rephraser ships with 9 — and you can write your own system prompts for anything else.</p>
+        <div class="modes-wrap">
+            <span class="m">Professional</span>
+            <span class="m">Casual</span>
+            <span class="m">Concise</span>
+            <span class="m">Elaborate</span>
+            <span class="m">Fix Grammar</span>
+            <span class="m">Confident</span>
+            <span class="m">Empathetic</span>
+            <span class="m">Summarize</span>
+            <span class="m">Key Points</span>
+            <span class="m hi">+ Your custom modes</span>
+        </div>
+    </div>
+</div>
+
+<!-- Models -->
+<div class="s">
+    <div class="s-inner">
+        <h2 style="font-size:36px; font-weight:800; letter-spacing:-1.5px;">Pick your model.</h2>
+        <p style="font-size:15px; color:var(--dim); margin-top:12px; max-width:520px;">Gemma 4 downloads automatically on first launch. Swap anytime in Settings — no terminal needed.</p>
+        <div class="mod-grid">
+            <div class="mc rec">
+                <h4>Gemma 4 E4B <span class="tag">Default</span></h4>
+                <p>Google's latest · Best quality · ~3 GB</p>
+            </div>
+            <div class="mc">
+                <h4>Gemma 3 4B</h4>
+                <p>Proven and fast · ~2.5 GB</p>
+            </div>
+            <div class="mc">
+                <h4>Qwen 3 4B</h4>
+                <p>Strong multilingual · ~2.5 GB</p>
+            </div>
+            <div class="mc">
+                <h4>Llama 3.2 3B</h4>
+                <p>Smallest and fastest · ~1.8 GB</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CTA -->
+<div class="bottom-cta">
+    <h2>Stop copy-pasting<br><span class="d">into ChatGPT.</span></h2>
+    <p>One shortcut. Nine modes. Fully private. Runs on your Mac.</p>
+    <a href="https://github.com/vatsan95/Rephraser#build--run" class="btn">
+        <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+        Download for Mac
+    </a>
+    <p style="font-size:12px; color:var(--faint); margin-top:16px;">macOS 14 (Sonoma) · Apple Silicon (M1+) · ~3 GB for AI model</p>
+</div>
+
+<footer>
+    <span>Rephraser · macOS</span>
+    <div class="f-links">
+        <a href="https://github.com/vatsan95/Rephraser">GitHub</a>
+        <a href="https://github.com/vatsan95/Rephraser/issues">Feedback</a>
+    </div>
+</footer>
 
 </body>
 </html>
