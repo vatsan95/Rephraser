@@ -25,6 +25,41 @@ final class SourceAppTracker {
         sourceApp?.localizedName
     }
 
+    /// Get the bundle identifier of the recorded source app
+    var sourceAppBundleID: String? {
+        sourceApp?.bundleIdentifier
+    }
+
+    /// Suggest a rephrase mode based on the source app
+    func suggestedMode() -> RephraseMode? {
+        guard let bundleID = sourceAppBundleID?.lowercased() else { return nil }
+
+        // Casual: messaging and social apps
+        if bundleID.contains("slack") || bundleID.contains("discord") ||
+           bundleID.contains("telegram") || bundleID.contains("whatsapp") ||
+           bundleID.contains("messages") || bundleID.contains("ichat") {
+            return .casual
+        }
+
+        // Professional: email and docs
+        if bundleID.contains("mail") || bundleID.contains("gmail") ||
+           bundleID.contains("outlook") || bundleID.contains("notion") ||
+           bundleID.contains("pages") || bundleID.contains("word") ||
+           bundleID.contains("docs") || bundleID.contains("linkedin") {
+            return .professional
+        }
+
+        // Fix Grammar: code editors
+        if bundleID.contains("xcode") || bundleID.contains("vscode") ||
+           bundleID.contains("visual studio") || bundleID.contains("jetbrains") ||
+           bundleID.contains("sublime") || bundleID.contains("cursor") ||
+           bundleID.contains("textmate") || bundleID.contains("bbedit") {
+            return .fixGrammar
+        }
+
+        return nil
+    }
+
     /// Clear the recorded source app
     func clear() {
         sourceApp = nil

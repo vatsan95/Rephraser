@@ -1,270 +1,452 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rephraser — Better writing in any app, one shortcut</title>
-    <meta name="description" content="Select text, press ⌥⇧R, get a polished version. On-device AI. No cloud, no accounts, no cost. macOS only.">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Text', 'Helvetica Neue', 'sans-serif'],
-                        mono: ['SF Mono', 'Menlo', 'monospace'],
-                    },
-                    colors: {
-                        surface: '#111111',
-                        dim: '#888888',
-                    }
-                }
-            }
-        }
-    </script>
+    <title>Rephraser — Better writing, one shortcut</title>
+    <meta name="description" content="Select text, press a shortcut, get a polished version. On-device AI. No cloud, no accounts, no cost.">
     <style>
-        /* Subtle grain texture */
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            opacity: 0.015;
-            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-            pointer-events: none;
-            z-index: 100;
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --black: #09090b;
+            --card: #111113;
+            --border: #1e1e22;
+            --text: #ececef;
+            --muted: #71717a;
+            --accent: #3b82f6;
+            --green: #22c55e;
+            --red: #ef4444;
         }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--black);
+            color: var(--text);
+            -webkit-font-smoothing: antialiased;
+            line-height: 1.6;
+        }
+
+        /* Utility */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+        .container-narrow { max-width: 680px; margin: 0 auto; padding: 0 40px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+
+        .text-muted { color: var(--muted); }
+        .text-sm { font-size: 14px; }
+        .text-xs { font-size: 12px; }
+        .text-center { text-align: center; }
+        .mt-2 { margin-top: 8px; }
+        .mt-4 { margin-top: 16px; }
+        .mt-6 { margin-top: 24px; }
+        .mt-8 { margin-top: 32px; }
+        .mb-6 { margin-bottom: 24px; }
+
+        /* Nav */
+        nav {
+            position: fixed; top: 0; width: 100%; z-index: 99;
+            background: rgba(9,9,11,0.85); backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+        }
+        .nav-inner {
+            max-width: 1200px; margin: 0 auto; padding: 0 40px;
+            height: 56px; display: flex; align-items: center; justify-content: space-between;
+        }
+        .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        .nav-brand svg { width: 28px; height: 28px; }
+        .nav-brand span { font-size: 15px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
+        .nav-links { display: flex; align-items: center; gap: 28px; }
+        .nav-links a { color: var(--muted); text-decoration: none; font-size: 13px; font-weight: 500; transition: color 0.2s; }
+        .nav-links a:hover { color: var(--text); }
+        .btn-nav {
+            background: var(--text); color: var(--black);
+            font-size: 13px; font-weight: 600; padding: 7px 16px;
+            border-radius: 8px; text-decoration: none; transition: opacity 0.2s;
+        }
+        .btn-nav:hover { opacity: 0.85; }
+
+        /* Hero — full width with side columns */
+        .hero {
+            padding: 140px 0 80px;
+            display: grid;
+            grid-template-columns: 1fr minmax(auto, 600px) 1fr;
+            gap: 0;
+        }
+        .hero-left, .hero-right { display: flex; align-items: flex-end; justify-content: center; padding-bottom: 40px; }
+        .hero-center { text-align: center; }
+        .hero h1 {
+            font-size: 56px; font-weight: 800; letter-spacing: -2.5px;
+            line-height: 1.05; margin-bottom: 20px;
+        }
+        .hero h1 span { color: var(--muted); }
+        .hero p { font-size: 17px; color: var(--muted); max-width: 460px; margin: 0 auto 32px; line-height: 1.7; }
         .kbd {
-            display: inline-block;
-            font-family: 'SF Mono', Menlo, monospace;
-            background: #1a1a1a;
-            border: 1px solid #2a2a2a;
-            border-bottom-width: 2px;
-            border-radius: 5px;
-            padding: 2px 8px;
-            font-size: 0.85em;
-            color: #ccc;
+            display: inline-block; font-family: 'SF Mono', Menlo, monospace;
+            background: #1a1a1e; border: 1px solid var(--border); border-bottom-width: 2px;
+            border-radius: 5px; padding: 1px 7px; font-size: 0.85em; color: #aaa;
         }
-        .fade-in {
-            animation: fadeUp 0.6s ease-out both;
+        .hero-cta { display: flex; align-items: center; justify-content: center; gap: 16px; flex-wrap: wrap; }
+        .btn-primary {
+            display: inline-block; background: var(--text); color: var(--black);
+            font-size: 15px; font-weight: 600; padding: 12px 28px;
+            border-radius: 10px; text-decoration: none; transition: opacity 0.2s;
         }
-        .fade-in-delay { animation: fadeUp 0.6s ease-out 0.15s both; }
-        .fade-in-delay-2 { animation: fadeUp 0.6s ease-out 0.3s both; }
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(16px); }
-            to { opacity: 1; transform: translateY(0); }
+        .btn-primary:hover { opacity: 0.85; }
+        .hero-meta { font-size: 13px; color: var(--muted); }
+
+        /* Floating app labels on sides */
+        .app-label {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 8px; padding: 6px 12px; font-size: 12px;
+            color: var(--muted); white-space: nowrap;
+        }
+        .app-label-stack { display: flex; flex-direction: column; gap: 8px; }
+
+        /* Section */
+        section { padding: 80px 0; border-top: 1px solid var(--border); }
+        .section-label {
+            font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em;
+            color: var(--muted); font-weight: 600; margin-bottom: 12px;
+        }
+        .section-title {
+            font-size: 36px; font-weight: 800; letter-spacing: -1.5px;
+            line-height: 1.15; margin-bottom: 16px;
+        }
+        .section-desc { font-size: 15px; color: var(--muted); line-height: 1.7; max-width: 520px; }
+
+        /* Pain points */
+        .pain-card {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 24px;
+        }
+        .pain-card p { font-size: 15px; color: #b4b4bc; line-height: 1.6; font-style: italic; }
+        .pain-card .attribution { font-size: 12px; color: var(--muted); margin-top: 10px; font-style: normal; }
+
+        /* Feature cards */
+        .feature-card {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 28px;
+        }
+        .feature-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+        .feature-card p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+        .feature-icon { font-size: 22px; margin-bottom: 14px; display: block; }
+
+        /* Comparison table */
+        .compare-row {
+            display: grid; grid-template-columns: 1fr 100px 100px;
+            border-bottom: 1px solid var(--border); font-size: 14px;
+        }
+        .compare-row > div { padding: 12px 16px; }
+        .compare-row.header { font-weight: 600; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+        .compare-row .label { color: #b4b4bc; }
+        .compare-row .yes { color: var(--green); text-align: center; }
+        .compare-row .no { color: var(--red); text-align: center; }
+        .compare-row .partial { color: var(--muted); text-align: center; font-size: 12px; }
+
+        /* Mode tags */
+        .mode-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+        .mode-tag {
+            background: var(--card); border: 1px solid var(--border);
+            padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 500;
+        }
+        .mode-tag.highlight {
+            background: rgba(59,130,246,0.08); border-color: rgba(59,130,246,0.2); color: var(--accent);
+        }
+
+        /* Model cards */
+        .model-card {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 10px; padding: 16px;
+        }
+        .model-card.recommended { border-color: rgba(59,130,246,0.3); }
+        .model-card h4 { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+        .model-card p { font-size: 12px; color: var(--muted); }
+        .badge {
+            display: inline-block; font-size: 10px; font-weight: 600;
+            background: rgba(59,130,246,0.15); color: var(--accent);
+            padding: 2px 8px; border-radius: 4px; margin-left: 6px; vertical-align: middle;
+        }
+
+        /* CTA */
+        .cta-section { text-align: center; padding: 100px 40px; border-top: 1px solid var(--border); }
+        .cta-section h2 { font-size: 40px; font-weight: 800; letter-spacing: -1.5px; margin-bottom: 12px; }
+        .cta-section p { font-size: 15px; color: var(--muted); margin-bottom: 28px; }
+
+        /* Footer */
+        footer {
+            padding: 24px 40px; border-top: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+            max-width: 1200px; margin: 0 auto;
+        }
+        footer a { color: var(--muted); text-decoration: none; font-size: 13px; transition: color 0.2s; }
+        footer a:hover { color: var(--text); }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .grid-2 { grid-template-columns: 1fr; gap: 32px; }
+            .grid-3 { grid-template-columns: 1fr; }
+            .grid-4 { grid-template-columns: 1fr 1fr; }
+            .hero { grid-template-columns: 1fr; padding: 120px 24px 60px; }
+            .hero-left, .hero-right { display: none; }
+            .hero h1 { font-size: 36px; }
+            .container, .container-narrow { padding: 0 20px; }
+            .section-title { font-size: 28px; }
+            .compare-row { grid-template-columns: 1fr 80px 80px; }
+            footer { flex-direction: column; gap: 12px; text-align: center; }
         }
     </style>
 </head>
-<body class="bg-black text-white antialiased">
+<body>
 
     <!-- Nav -->
-    <nav class="fixed top-0 w-full z-50 bg-black/80 backdrop-blur-md border-b border-white/5">
-        <div class="max-w-3xl mx-auto px-6 h-14 flex items-center justify-between">
-            <span class="text-sm font-semibold tracking-tight">Rephraser</span>
-            <div class="flex items-center gap-6">
-                <a href="#why" class="text-xs text-dim hover:text-white transition-colors">Why</a>
-                <a href="#how" class="text-xs text-dim hover:text-white transition-colors">How</a>
-                <a href="https://github.com/vatsan95/Rephraser" class="text-xs text-dim hover:text-white transition-colors">GitHub</a>
-                <a href="https://github.com/vatsan95/Rephraser/releases/latest" class="text-xs bg-white text-black font-medium px-3 py-1 rounded-full hover:bg-gray-200 transition-colors">Download</a>
+    <nav>
+        <div class="nav-inner">
+            <a href="#" class="nav-brand">
+                <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="2" y="2" width="28" height="28" rx="8" fill="#18181b" stroke="#3b82f6" stroke-width="1.5"/>
+                    <path d="M9 11h14M9 16h10M9 21h12" stroke="#3b82f6" stroke-width="1.8" stroke-linecap="round"/>
+                    <path d="M22 14l3 4-3 4" stroke="#ececef" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span>Rephraser</span>
+            </a>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#compare">vs Apple AI</a>
+                <a href="https://github.com/vatsan95/Rephraser">GitHub</a>
+                <a href="https://github.com/vatsan95/Rephraser/releases/latest" class="btn-nav">Download</a>
             </div>
         </div>
     </nav>
 
     <!-- Hero -->
-    <section class="pt-32 pb-20 px-6">
-        <div class="max-w-2xl mx-auto text-center">
-            <p class="fade-in text-xs uppercase tracking-[0.2em] text-dim mb-6">macOS menu bar app</p>
-            <h1 class="fade-in text-4xl sm:text-5xl font-bold tracking-tight leading-[1.1] mb-5">
-                Rephrase anything.<br>
-                <span class="text-dim">Without leaving your app.</span>
-            </h1>
-            <p class="fade-in-delay text-base text-dim max-w-md mx-auto mb-8 leading-relaxed">
-                Select text. Press <span class="kbd">⌥</span> <span class="kbd">⇧</span> <span class="kbd">R</span>. Done.<br>
-                AI runs on your Mac. Nothing leaves your device. Ever.
-            </p>
-            <div class="fade-in-delay-2 flex flex-col sm:flex-row items-center justify-center gap-3">
-                <a href="https://github.com/vatsan95/Rephraser/releases/latest" class="bg-white text-black text-sm font-semibold px-6 py-2.5 rounded-lg hover:bg-gray-200 transition-colors">
-                    Download Free
-                </a>
-                <span class="text-xs text-dim">macOS 14+ &middot; Apple Silicon &middot; ~3 GB for AI model</span>
+    <div class="hero">
+        <div class="hero-left">
+            <div class="app-label-stack">
+                <div class="app-label">Slack</div>
+                <div class="app-label">Gmail</div>
+                <div class="app-label">Notion</div>
+            </div>
+        </div>
+        <div class="hero-center">
+            <h1>Rephrase anything.<br><span>Without leaving your app.</span></h1>
+            <p>Select text. Press <span class="kbd">⌥</span><span class="kbd">⇧</span><span class="kbd">R</span> (or your own shortcut). Get a polished version in seconds. AI runs on your Mac — nothing ever leaves your device.</p>
+            <div class="hero-cta">
+                <a href="https://github.com/vatsan95/Rephraser/releases/latest" class="btn-primary">Download Free</a>
+                <span class="hero-meta">macOS 14+ · Apple Silicon · Free forever</span>
+            </div>
+        </div>
+        <div class="hero-right">
+            <div class="app-label-stack">
+                <div class="app-label">VS Code</div>
+                <div class="app-label">Discord</div>
+                <div class="app-label">Chrome</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pain points — full width -->
+    <section>
+        <div class="container">
+            <div class="section-label text-center">Sound familiar?</div>
+            <div class="grid-3 mt-6">
+                <div class="pain-card">
+                    <p>"I keep copying text into ChatGPT just to fix the tone of a Slack message. It takes 30 seconds for something that should take 1."</p>
+                    <div class="attribution">— Every knowledge worker, daily</div>
+                </div>
+                <div class="pain-card">
+                    <p>"Apple's Writing Tools only gives me 3 tones. And it doesn't work in half my apps."</p>
+                    <div class="attribution">— Reddit, r/macapps</div>
+                </div>
+                <div class="pain-card">
+                    <p>"I don't want my client emails going through someone else's servers just to sound more professional."</p>
+                    <div class="attribution">— Legal / healthcare professionals</div>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Pain Points -->
-    <section id="why" class="py-16 px-6 border-t border-white/5">
-        <div class="max-w-2xl mx-auto">
-            <p class="text-xs uppercase tracking-[0.2em] text-dim mb-8 text-center">Sound familiar?</p>
-            <div class="space-y-4">
-                <div class="bg-surface border border-white/5 rounded-xl p-5">
-                    <p class="text-sm text-gray-300 leading-relaxed">"I keep copying text into ChatGPT just to fix the tone of a Slack message. It takes 30 seconds for something that should take 1."</p>
+    <!-- Features — asymmetric layout -->
+    <section id="features">
+        <div class="container">
+            <div class="grid-2">
+                <div>
+                    <div class="section-label">How it works</div>
+                    <div class="section-title">Three steps.<br>Under two seconds.</div>
+                    <div class="section-desc">
+                        Rephraser lives in your menu bar. Select text in any app, press your shortcut, review the result, accept or dismiss. Your clipboard is always preserved.
+                    </div>
+                    <div class="mt-6" style="display: flex; gap: 32px;">
+                        <div>
+                            <div style="font-size: 28px; font-weight: 800; color: var(--accent);">1</div>
+                            <div class="text-sm mt-2">Select text</div>
+                            <div class="text-xs text-muted">Any app, anywhere</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 28px; font-weight: 800; color: var(--accent);">2</div>
+                            <div class="text-sm mt-2">Press shortcut</div>
+                            <div class="text-xs text-muted">⌥⇧R or custom</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 28px; font-weight: 800; color: var(--accent);">3</div>
+                            <div class="text-sm mt-2">Accept or dismiss</div>
+                            <div class="text-xs text-muted">Enter / Escape</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="bg-surface border border-white/5 rounded-xl p-5">
-                    <p class="text-sm text-gray-300 leading-relaxed">"Apple's Writing Tools only gives me 3 tones. And it doesn't even work in half my apps."</p>
-                </div>
-                <div class="bg-surface border border-white/5 rounded-xl p-5">
-                    <p class="text-sm text-gray-300 leading-relaxed">"I don't want my client emails going through someone else's servers just to sound more professional."</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Solution -->
-    <section class="py-16 px-6 border-t border-white/5">
-        <div class="max-w-2xl mx-auto text-center">
-            <h2 class="text-2xl sm:text-3xl font-bold tracking-tight mb-4">One shortcut. Any app. Fully private.</h2>
-            <p class="text-sm text-dim max-w-lg mx-auto mb-12">Rephraser sits in your menu bar. Select text anywhere &mdash; Slack, Gmail, Notion, VS Code, your browser &mdash; press <span class="kbd">⌥⇧R</span> (customizable), and get a polished version instantly.</p>
-
-            <div class="grid sm:grid-cols-3 gap-4 text-left">
-                <div class="bg-surface border border-white/5 rounded-xl p-5">
-                    <div class="text-lg mb-2">1</div>
-                    <p class="text-sm font-medium mb-1">Select text</p>
-                    <p class="text-xs text-dim">In any app on your Mac</p>
-                </div>
-                <div class="bg-surface border border-white/5 rounded-xl p-5">
-                    <div class="text-lg mb-2">2</div>
-                    <p class="text-sm font-medium mb-1">Press ⌥⇧R</p>
-                    <p class="text-xs text-dim">Customizable shortcut, AI rephrases in real time</p>
-                </div>
-                <div class="bg-surface border border-white/5 rounded-xl p-5">
-                    <div class="text-lg mb-2">3</div>
-                    <p class="text-sm font-medium mb-1">Accept or dismiss</p>
-                    <p class="text-xs text-dim">Enter to replace, Esc to cancel</p>
+                <div class="grid-2" style="grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="feature-card">
+                        <span class="feature-icon">🔒</span>
+                        <h3>100% On-Device</h3>
+                        <p>AI runs via Apple MLX on your chip. No servers, no cloud, no data leaves your Mac. Ever.</p>
+                    </div>
+                    <div class="feature-card">
+                        <span class="feature-icon">⚡</span>
+                        <h3>Instant Streaming</h3>
+                        <p>See results appear token-by-token in real time. First token in under 2 seconds.</p>
+                    </div>
+                    <div class="feature-card">
+                        <span class="feature-icon">🧠</span>
+                        <h3>Context-Aware</h3>
+                        <p>Auto-detects your app. Slack gets casual, Gmail gets professional. Override anytime.</p>
+                    </div>
+                    <div class="feature-card">
+                        <span class="feature-icon">🔀</span>
+                        <h3>Diff View</h3>
+                        <p>See exactly what changed. Toggle between result and before/after comparison.</p>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- vs Apple Intelligence -->
-    <section id="compare" class="py-16 px-6 border-t border-white/5">
-        <div class="max-w-2xl mx-auto">
-            <p class="text-xs uppercase tracking-[0.2em] text-dim mb-8 text-center">Why not just use Apple Intelligence?</p>
-
-            <div class="space-y-3">
-                <div class="grid grid-cols-[1fr,auto,auto] gap-0 text-xs">
-                    <div class="p-3 text-dim"></div>
-                    <div class="p-3 text-center font-semibold text-white w-28">Rephraser</div>
-                    <div class="p-3 text-center font-semibold text-dim w-28">Apple AI</div>
+    <section id="compare">
+        <div class="container">
+            <div class="grid-2">
+                <div>
+                    <div class="section-label">The comparison</div>
+                    <div class="section-title">Why not Apple Intelligence?</div>
+                    <div class="section-desc">
+                        Apple's Writing Tools are limited to 3 tones, route complex requests through cloud servers, fail in many third-party apps, and aren't available in every country. Rephraser fixes all of that.
+                    </div>
                 </div>
-
-                <div class="grid grid-cols-[1fr,auto,auto] gap-0 bg-surface border border-white/5 rounded-lg text-sm">
-                    <div class="p-3 text-gray-300">Works in every app</div>
-                    <div class="p-3 text-center w-28 text-green-400">&#10003;</div>
-                    <div class="p-3 text-center w-28 text-red-400">&#10007;</div>
-                </div>
-                <div class="grid grid-cols-[1fr,auto,auto] gap-0 bg-surface border border-white/5 rounded-lg text-sm">
-                    <div class="p-3 text-gray-300">100% on-device, no cloud</div>
-                    <div class="p-3 text-center w-28 text-green-400">&#10003;</div>
-                    <div class="p-3 text-center w-28 text-red-400">&#10007;</div>
-                </div>
-                <div class="grid grid-cols-[1fr,auto,auto] gap-0 bg-surface border border-white/5 rounded-lg text-sm">
-                    <div class="p-3 text-gray-300">Available in all countries</div>
-                    <div class="p-3 text-center w-28 text-green-400">&#10003;</div>
-                    <div class="p-3 text-center w-28 text-red-400">&#10007;</div>
-                </div>
-                <div class="grid grid-cols-[1fr,auto,auto] gap-0 bg-surface border border-white/5 rounded-lg text-sm">
-                    <div class="p-3 text-gray-300">6+ writing modes + custom</div>
-                    <div class="p-3 text-center w-28 text-green-400">&#10003;</div>
-                    <div class="p-3 text-center w-28 text-red-400">3 fixed</div>
-                </div>
-                <div class="grid grid-cols-[1fr,auto,auto] gap-0 bg-surface border border-white/5 rounded-lg text-sm">
-                    <div class="p-3 text-gray-300">Choose your own AI model</div>
-                    <div class="p-3 text-center w-28 text-green-400">&#10003;</div>
-                    <div class="p-3 text-center w-28 text-red-400">&#10007;</div>
-                </div>
-                <div class="grid grid-cols-[1fr,auto,auto] gap-0 bg-surface border border-white/5 rounded-lg text-sm">
-                    <div class="p-3 text-gray-300">Works offline</div>
-                    <div class="p-3 text-center w-28 text-green-400">&#10003;</div>
-                    <div class="p-3 text-center w-28 text-dim">Partial</div>
-                </div>
-                <div class="grid grid-cols-[1fr,auto,auto] gap-0 bg-surface border border-white/5 rounded-lg text-sm">
-                    <div class="p-3 text-gray-300">Open source</div>
-                    <div class="p-3 text-center w-28 text-green-400">&#10003;</div>
-                    <div class="p-3 text-center w-28 text-red-400">&#10007;</div>
+                <div>
+                    <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden;">
+                        <div class="compare-row header">
+                            <div></div>
+                            <div style="text-align: center;">Rephraser</div>
+                            <div style="text-align: center;">Apple AI</div>
+                        </div>
+                        <div class="compare-row"><div class="label">Works in every app</div><div class="yes">✓</div><div class="no">✗</div></div>
+                        <div class="compare-row"><div class="label">100% on-device</div><div class="yes">✓</div><div class="no">✗</div></div>
+                        <div class="compare-row"><div class="label">All countries</div><div class="yes">✓</div><div class="no">✗</div></div>
+                        <div class="compare-row"><div class="label">9 modes + custom</div><div class="yes">✓</div><div class="partial">3 fixed</div></div>
+                        <div class="compare-row"><div class="label">Choose AI model</div><div class="yes">✓</div><div class="no">✗</div></div>
+                        <div class="compare-row"><div class="label">Context-aware</div><div class="yes">✓</div><div class="no">✗</div></div>
+                        <div class="compare-row"><div class="label">Diff view</div><div class="yes">✓</div><div class="no">✗</div></div>
+                        <div class="compare-row" style="border: none;"><div class="label">Works offline</div><div class="yes">✓</div><div class="partial">Partial</div></div>
+                    </div>
                 </div>
             </div>
-
-            <p class="text-xs text-dim text-center mt-6">Apple Intelligence routes complex requests through Private Cloud Compute and ChatGPT. Writing Tools only works in apps that use standard text fields &mdash; it fails in WhatsApp, custom editors, and most web apps. It's unavailable in China and was delayed in the EU for months.</p>
         </div>
     </section>
 
     <!-- Modes -->
-    <section class="py-16 px-6 border-t border-white/5">
-        <div class="max-w-2xl mx-auto text-center">
-            <h2 class="text-2xl font-bold tracking-tight mb-3">More than 3 tones.</h2>
-            <p class="text-sm text-dim mb-8">Apple gives you Friendly, Professional, Concise. That's it. Rephraser gives you:</p>
-            <div class="flex flex-wrap justify-center gap-2">
-                <span class="bg-surface border border-white/5 text-sm px-4 py-1.5 rounded-full">Professional</span>
-                <span class="bg-surface border border-white/5 text-sm px-4 py-1.5 rounded-full">Casual</span>
-                <span class="bg-surface border border-white/5 text-sm px-4 py-1.5 rounded-full">Concise</span>
-                <span class="bg-surface border border-white/5 text-sm px-4 py-1.5 rounded-full">Elaborate</span>
-                <span class="bg-surface border border-white/5 text-sm px-4 py-1.5 rounded-full">Fix Grammar</span>
-                <span class="bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm px-4 py-1.5 rounded-full">+ Your own custom modes</span>
+    <section>
+        <div class="container">
+            <div class="grid-2">
+                <div>
+                    <div class="section-label">Writing modes</div>
+                    <div class="section-title">9 modes. Plus your own.</div>
+                    <div class="section-desc">
+                        Apple gives you 3 fixed tones. Rephraser ships with 9 carefully crafted modes — and you can create unlimited custom modes with your own system prompts.
+                    </div>
+                </div>
+                <div>
+                    <div class="mode-grid">
+                        <span class="mode-tag">Professional</span>
+                        <span class="mode-tag">Casual</span>
+                        <span class="mode-tag">Concise</span>
+                        <span class="mode-tag">Elaborate</span>
+                        <span class="mode-tag">Fix Grammar</span>
+                        <span class="mode-tag">Confident</span>
+                        <span class="mode-tag">Empathetic</span>
+                        <span class="mode-tag">Summarize</span>
+                        <span class="mode-tag">Key Points</span>
+                        <span class="mode-tag highlight">+ Custom modes</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Models -->
+    <section>
+        <div class="container">
+            <div class="grid-2">
+                <div>
+                    <div class="section-label">AI Models</div>
+                    <div class="section-title">Pick your model. Or don't.</div>
+                    <div class="section-desc">
+                        Gemma 4 downloads automatically and works great out of the box. Want something smaller or faster? Switch anytime in Settings. Apple doesn't let you choose. We do.
+                    </div>
+                </div>
+                <div class="grid-2" style="grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div class="model-card recommended">
+                        <h4>Gemma 4 E4B <span class="badge">Default</span></h4>
+                        <p>Google's latest · Best quality · ~3 GB</p>
+                    </div>
+                    <div class="model-card">
+                        <h4>Gemma 3 4B</h4>
+                        <p>Proven & fast · ~2.5 GB</p>
+                    </div>
+                    <div class="model-card">
+                        <h4>Qwen 3 4B</h4>
+                        <p>Strong multilingual · ~2.5 GB</p>
+                    </div>
+                    <div class="model-card">
+                        <h4>Llama 3.2 3B</h4>
+                        <p>Smallest & fastest · ~1.8 GB</p>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- Privacy -->
-    <section class="py-16 px-6 border-t border-white/5">
-        <div class="max-w-xl mx-auto text-center">
-            <h2 class="text-2xl font-bold tracking-tight mb-3">Your text stays on your Mac.</h2>
-            <p class="text-sm text-dim leading-relaxed">
+    <section>
+        <div class="container-narrow text-center">
+            <div class="section-label">Privacy</div>
+            <div class="section-title">Your text stays on your Mac.</div>
+            <p style="font-size: 15px; color: var(--muted); line-height: 1.7; margin-top: 12px;">
                 Rephraser uses Apple MLX to run AI models directly on your Apple Silicon chip.
-                No server calls, no cloud processing, no accounts, no telemetry.
-                Your clipboard is always restored. We can't read your text because we literally never see it.
+                No server calls. No cloud processing. No accounts. No telemetry.
+                Your clipboard is always restored. We literally never see your text.
             </p>
         </div>
     </section>
 
-    <!-- Models -->
-    <section class="py-16 px-6 border-t border-white/5">
-        <div class="max-w-2xl mx-auto text-center">
-            <h2 class="text-2xl font-bold tracking-tight mb-3">Pick your model.</h2>
-            <p class="text-sm text-dim mb-8">Apple doesn't let you choose. We do.</p>
-            <div class="grid sm:grid-cols-2 gap-3 text-left text-sm max-w-lg mx-auto">
-                <div class="bg-surface border border-blue-500/20 rounded-lg p-4">
-                    <div class="flex items-center gap-2 mb-1">
-                        <span class="font-medium">Gemma 4 E4B</span>
-                        <span class="text-[10px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded">Recommended</span>
-                    </div>
-                    <p class="text-xs text-dim">Google's latest &middot; Best quality &middot; ~3 GB</p>
-                </div>
-                <div class="bg-surface border border-white/5 rounded-lg p-4">
-                    <span class="font-medium">Gemma 3 4B</span>
-                    <p class="text-xs text-dim">Proven &amp; fast &middot; ~2.5 GB</p>
-                </div>
-                <div class="bg-surface border border-white/5 rounded-lg p-4">
-                    <span class="font-medium">Qwen 3 4B</span>
-                    <p class="text-xs text-dim">Strong multilingual &middot; ~2.5 GB</p>
-                </div>
-                <div class="bg-surface border border-white/5 rounded-lg p-4">
-                    <span class="font-medium">Llama 3.2 3B</span>
-                    <p class="text-xs text-dim">Smallest &amp; fastest &middot; ~1.8 GB</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <!-- Final CTA -->
-    <section class="py-20 px-6 border-t border-white/5">
-        <div class="max-w-xl mx-auto text-center">
-            <h2 class="text-2xl sm:text-3xl font-bold tracking-tight mb-3">Stop tab-switching to fix your writing.</h2>
-            <p class="text-sm text-dim mb-8">Free, open source, private. One shortcut changes everything.</p>
-            <a href="https://github.com/vatsan95/Rephraser/releases/latest" class="inline-block bg-white text-black text-sm font-semibold px-8 py-3 rounded-lg hover:bg-gray-200 transition-colors">
-                Download for macOS
-            </a>
-            <p class="text-xs text-dim mt-4">Requires macOS 14 (Sonoma) &middot; Apple Silicon (M1+)</p>
-        </div>
-    </section>
+    <div class="cta-section">
+        <h2>Stop tab-switching<br>to fix your writing.</h2>
+        <p>One shortcut. Nine modes. Fully private. Runs on your Mac.</p>
+        <a href="https://github.com/vatsan95/Rephraser/releases/latest" class="btn-primary">Download for macOS</a>
+        <div class="text-xs text-muted mt-4">macOS 14 (Sonoma) · Apple Silicon (M1+) · ~3 GB for AI model</div>
+    </div>
 
     <!-- Footer -->
-    <footer class="py-8 px-6 border-t border-white/5">
-        <div class="max-w-3xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p class="text-xs text-dim">MIT License &middot; Free &amp; Open Source</p>
-            <div class="flex items-center gap-6">
-                <a href="https://github.com/vatsan95/Rephraser" class="text-xs text-dim hover:text-white transition-colors">GitHub</a>
-                <a href="https://github.com/vatsan95/Rephraser/issues" class="text-xs text-dim hover:text-white transition-colors">Feedback</a>
-            </div>
+    <footer>
+        <span class="text-xs text-muted">Rephraser · Made for macOS</span>
+        <div style="display: flex; gap: 24px;">
+            <a href="https://github.com/vatsan95/Rephraser">GitHub</a>
+            <a href="https://github.com/vatsan95/Rephraser/issues">Feedback</a>
         </div>
     </footer>
 

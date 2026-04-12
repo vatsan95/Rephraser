@@ -90,7 +90,6 @@ final class RephraseCoordinator {
         }
 
         // Reset state
-        activeMode = appState.defaultMode
         streamingText = ""
         originalText = ""
         isStreaming = false
@@ -99,6 +98,13 @@ final class RephraseCoordinator {
         // Record the source app BEFORE we do anything else.
         // The source app must remain focused during text capture.
         sourceTracker.recordFrontmostApp()
+
+        // Context-aware mode: suggest based on source app, fall back to user's default
+        if let suggested = sourceTracker.suggestedMode() {
+            activeMode = suggested
+        } else {
+            activeMode = appState.defaultMode
+        }
 
         // Start the capture flow. Panel is NOT shown yet --
         // Cmd+C must fire while the source app still has focus.
