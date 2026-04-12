@@ -59,9 +59,9 @@ enum AppError: LocalizedError, Identifiable {
         case .accessibilityNotGranted:
             return "Rephraser needs Accessibility permission to capture and replace text. Click below to open System Settings."
         case .noModelLoaded:
-            return "No model loaded. Download a model in Settings to start rephrasing."
+            return "No AI model is loaded. Open Settings → Model tab → click Download on a model (Gemma 4 E4B recommended)."
         case .emptySelection:
-            return "No text detected. Select some text first, then press the shortcut."
+            return "No text was copied. Make sure text is selected in the other app before pressing the shortcut."
         case .textTooLong(let charCount, let maxCount):
             return "Selection too long (\(charCount.formatted()) characters). Select a shorter passage (max \(maxCount.formatted()))."
         case .inferenceFailed(let underlying):
@@ -69,7 +69,7 @@ enum AppError: LocalizedError, Identifiable {
         case .modelDownloadFailed(let underlying):
             return "Model download failed: \(underlying)"
         case .insufficientMemory:
-            return "Not enough memory to load the model. Close some apps and try again."
+            return "Not enough memory to load the model. Close some apps and try again, or switch to a smaller model like Llama 3.2 3B."
         case .streamingFailed(let underlying):
             return "Rephrasing failed: \(underlying)"
         case .unknownError(let underlying):

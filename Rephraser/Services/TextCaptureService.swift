@@ -55,13 +55,13 @@ final class TextCaptureService {
         pb.setString(text, forType: .string)
 
         // 2. Brief delay to ensure app is ready to receive paste
-        try? await Task.sleep(for: .milliseconds(50))
+        try? await Task.sleep(for: .milliseconds(30))
 
         // 3. Simulate Cmd+V to paste
         CGEventHelpers.simulatePaste()
 
         // 4. Wait for paste to complete
-        try? await Task.sleep(for: .milliseconds(200))
+        try? await Task.sleep(for: .milliseconds(100))
 
         // 5. Restore the original clipboard
         savedSnapshot?.restore()
