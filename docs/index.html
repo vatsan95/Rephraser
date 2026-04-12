@@ -143,16 +143,11 @@
         .how-cell h3 { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 10px; }
         .how-cell p { font-size: 14px; color: var(--dim); line-height: 1.65; }
 
-        /* ---- Features (editorial, no icons) ---- */
-        .feat-list { margin-top: 64px; }
-        .feat-row {
-            display: grid; grid-template-columns: 280px 1fr; gap: 24px;
-            padding: 28px 0; border-bottom: 1px solid var(--border);
-            align-items: baseline;
-        }
-        .feat-row:first-child { border-top: 1px solid var(--border); }
-        .feat-row h3 { font-size: 15px; font-weight: 700; letter-spacing: -0.3px; }
-        .feat-row p { font-size: 14px; color: var(--dim); line-height: 1.65; }
+        /* ---- Features: compact grid ---- */
+        .feat-compact { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border-radius: 12px; overflow: hidden; margin-top: 16px; }
+        .feat-sm { background: var(--surface); padding: 20px 24px; }
+        .feat-sm h4 { font-size: 13px; font-weight: 700; letter-spacing: -0.2px; margin-bottom: 3px; }
+        .feat-sm p { font-size: 12px; color: var(--dim); line-height: 1.5; }
 
         /* ---- Comparison ---- */
         .cmp-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; }
@@ -211,17 +206,71 @@
             opacity: 1; transform: translateY(0);
         }
 
-        /* ---- Responsive ---- */
+        /* ---- Responsive: tablet ---- */
         @media (max-width: 900px) {
             .nav-c, .s-inner, footer { padding-left: 24px; padding-right: 24px; }
             .hero { padding: 130px 24px 60px; }
             .hero h1 { font-size: 36px; letter-spacing: -1.5px; }
+            .hero p { font-size: 15px; }
             .how-grid { grid-template-columns: 1fr; }
-            .feat-row { grid-template-columns: 1fr; gap: 4px; }
-            .cmp-layout { grid-template-columns: 1fr; }
+            .feat-compact { grid-template-columns: 1fr 1fr; }
+            .cmp-layout { grid-template-columns: 1fr; gap: 40px; }
+            .cmp-text h2 { font-size: 28px; }
             .mod-grid { grid-template-columns: 1fr 1fr; }
             .bottom-cta h2 { font-size: 30px; }
             .bottom-cta { padding: 80px 24px; }
+            .section-h { font-size: 28px; }
+        }
+
+        /* ---- Responsive: mobile ---- */
+        @media (max-width: 520px) {
+            .nav-c { padding: 0 16px; height: 50px; }
+            .nav-r { gap: 14px; }
+            .nav-r a:not(.nav-btn) { display: none; }
+            .nav-btn { font-size: 11px; padding: 5px 12px; }
+            .wordmark { font-size: 14px; }
+            .nav-logo { width: 22px; height: 22px; }
+
+            .hero { padding: 110px 16px 48px; }
+            .hero-privacy { font-size: 11px; padding: 4px 10px; }
+            .hero h1 { font-size: 28px; letter-spacing: -1.2px; }
+            .hero p { font-size: 14px; max-width: 100%; }
+            .hero-cta { flex-direction: column; gap: 10px; }
+            .btn { font-size: 14px; padding: 12px 24px; width: 100%; justify-content: center; }
+            .hero-meta { font-size: 11px; }
+            .hero-apps { gap: 4px; }
+            .ha { font-size: 10px; padding: 2px 7px; }
+            .install-toast { max-width: calc(100% - 24px); font-size: 12px; bottom: 16px; }
+
+            .s-inner { padding: 64px 16px; }
+            .section-h { font-size: 24px; letter-spacing: -1px; }
+            .section-sub { font-size: 13px; }
+
+            .how-grid { margin-top: 36px; }
+            .how-cell { padding: 28px 20px; }
+            .how-cell h3 { font-size: 17px; }
+            .how-cell p { font-size: 13px; }
+
+            .feat-compact { grid-template-columns: 1fr; }
+            .feat-sm { padding: 16px 20px; }
+
+            .cmp-text h2 { font-size: 24px; }
+            .cmp-text p { font-size: 13px; }
+            .tbl { font-size: 12px; }
+            .tr > span { padding: 10px 12px; font-size: 12px; }
+            .tr.th > span { font-size: 10px; }
+
+            .modes-wrap { gap: 6px; margin-top: 24px; }
+            .m { padding: 7px 14px; font-size: 12px; }
+
+            .mod-grid { grid-template-columns: 1fr; gap: 8px; margin-top: 24px; }
+            .mc { padding: 16px; }
+
+            .bottom-cta { padding: 64px 16px; }
+            .bottom-cta h2 { font-size: 26px; letter-spacing: -1.2px; }
+            .bottom-cta p { font-size: 13px; }
+
+            footer { padding: 20px 16px; flex-direction: column; gap: 12px; }
         }
     </style>
 </head>
@@ -310,57 +359,56 @@
 <!-- Features -->
 <div class="s" id="features">
     <div class="s-inner fade-in">
-        <h2 class="section-h">Built for people who write all day.</h2>
-        <p class="section-sub" style="max-width:560px;">Every feature exists because switching to ChatGPT for a two-sentence rewrite is absurd.</p>
+        <h2 class="section-h">Everything else you get.</h2>
 
-        <div class="feat-list">
-            <div class="feat-row">
-                <h3>On-device AI</h3>
-                <p>Runs via Apple MLX directly on your Apple Silicon chip. No servers, no cloud, no API keys. Your text never leaves your machine.</p>
+        <div class="feat-compact" style="margin-top: 40px;">
+            <div class="feat-sm">
+                <h4>On-device AI</h4>
+                <p>Apple MLX. Your text never leaves your Mac.</p>
             </div>
-            <div class="feat-row">
-                <h3>Works in every app</h3>
-                <p>System-wide via clipboard capture. Slack, Gmail, Notion, VS Code, Chrome, Discord, Pages, Notes — any app where you can select text.</p>
+            <div class="feat-sm">
+                <h4>Context-aware</h4>
+                <p>Slack → casual. Gmail → professional. Auto.</p>
             </div>
-            <div class="feat-row">
-                <h3>Context-aware modes</h3>
-                <p>Automatically picks the right tone based on your app. Slack gets casual, Gmail gets professional, VS Code gets grammar-only.</p>
+            <div class="feat-sm">
+                <h4>Streams live</h4>
+                <p>First token in under 2s. No spinner.</p>
             </div>
-            <div class="feat-row">
-                <h3>Real-time streaming</h3>
-                <p>Results appear token-by-token as they generate. First token in under 2 seconds on M1, faster on newer chips.</p>
+            <div class="feat-sm">
+                <h4>Diff view</h4>
+                <p>See exactly what changed before accepting.</p>
             </div>
-            <div class="feat-row">
-                <h3>Before / after diff view</h3>
-                <p>Toggle diff view to see your original alongside the rephrased version with color-coded highlighting. Know exactly what changed.</p>
+            <div class="feat-sm">
+                <h4>9 modes + custom</h4>
+                <p>Write your own system prompts.</p>
             </div>
-            <div class="feat-row">
-                <h3>9 built-in modes + custom</h3>
-                <p>Professional, Casual, Concise, Elaborate, Fix Grammar, Confident, Empathetic, Summarize, Key Points. Create your own with custom system prompts.</p>
+            <div class="feat-sm">
+                <h4>4 AI models</h4>
+                <p>Gemma 4, Gemma 3, Qwen 3, Llama 3.2.</p>
             </div>
-            <div class="feat-row">
-                <h3>Custom keyboard shortcut</h3>
-                <p>Record any key combination in Settings — Cmd, Option, Shift, Ctrl + any key. Reset to default with one click.</p>
+            <div class="feat-sm">
+                <h4>Custom shortcut</h4>
+                <p>Any key combo. Set in Settings.</p>
             </div>
-            <div class="feat-row">
-                <h3>Choose your AI model</h3>
-                <p>Download and switch between Gemma 4, Gemma 3, Qwen 3, Phi-4, and Llama 3.2. All managed inside the app — no terminal needed.</p>
+            <div class="feat-sm">
+                <h4>Works everywhere</h4>
+                <p>System-wide. No plugins needed.</p>
             </div>
-            <div class="feat-row">
-                <h3>Full clipboard preservation</h3>
-                <p>Saves and restores your entire clipboard — images, files, rich text — through the whole rephrase flow. Nothing gets lost.</p>
+            <div class="feat-sm">
+                <h4>Fully offline</h4>
+                <p>No internet after model download.</p>
             </div>
-            <div class="feat-row">
-                <h3>Works completely offline</h3>
-                <p>Once the model downloads, zero internet needed. Airplanes, coffee shops, VPN tunnels — works anywhere your Mac does.</p>
+            <div class="feat-sm">
+                <h4>Clipboard safe</h4>
+                <p>Images, files, rich text — all restored.</p>
             </div>
-            <div class="feat-row">
-                <h3>30-second timeout safety</h3>
-                <p>If the model hangs, inference is automatically cancelled with a clear error and retry option. No frozen UI.</p>
+            <div class="feat-sm">
+                <h4>Launch at login</h4>
+                <p>Menu bar app. Always ready.</p>
             </div>
-            <div class="feat-row">
-                <h3>Launch at login + sound feedback</h3>
-                <p>Starts automatically and lives in your menu bar. Optional sound confirms when text is pasted back.</p>
+            <div class="feat-sm">
+                <h4>Timeout safety</h4>
+                <p>30s limit. Auto-cancels if stuck.</p>
             </div>
         </div>
     </div>
