@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rephraser -- On-Device Text Rephrasing for macOS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #0a0a0a;
+            --surface: #141414;
+            --border: #222;
+            --text: #e8e8e8;
+            --text-secondary: #888;
+            --accent: #4a9eff;
+            --accent-glow: rgba(74, 158, 255, 0.15);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Nav */
+        nav {
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+        }
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            margin-left: 24px;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover { color: var(--text); }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 100px 0 80px;
+        }
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 700;
+            letter-spacing: -1.5px;
+            line-height: 1.1;
+            margin-bottom: 16px;
+        }
+        .hero .subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 480px;
+            margin: 0 auto 40px;
+        }
+        .shortcut {
+            display: inline-block;
+            font-family: 'SF Mono', 'Menlo', monospace;
+            font-size: 14px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 6px 14px;
+            border-radius: 8px;
+            margin-bottom: 40px;
+            color: var(--text-secondary);
+        }
+        .cta {
+            display: inline-block;
+            background: var(--accent);
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 14px 32px;
+            border-radius: 10px;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+        .cta:hover { opacity: 0.9; }
+        .cta-note {
+            display: block;
+            margin-top: 12px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Features */
+        .features {
+            padding: 60px 0;
+            border-top: 1px solid var(--border);
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+        }
+        .feature {
+            padding: 24px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+        .feature-icon {
+            font-size: 24px;
+            margin-bottom: 12px;
+        }
+        .feature h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .feature p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* How it works */
+        .how {
+            padding: 60px 0;
+            border-top: 1px solid var(--border);
+        }
+        .how h2 {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .steps {
+            display: flex;
+            gap: 24px;
+        }
+        .step {
+            flex: 1;
+            text-align: center;
+        }
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: var(--accent-glow);
+            color: var(--accent);
+            border-radius: 50%;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        .step h3 {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .step p {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Modes */
+        .modes {
+            padding: 60px 0;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+        .modes h2 {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 32px;
+        }
+        .mode-tags {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+        .mode-tag {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Requirements */
+        .requirements {
+            padding: 60px 0;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+        .requirements h2 {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 16px;
+        }
+        .req-list {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* Footer */
+        footer {
+            padding: 40px 0;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+        footer p {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+        footer a:hover { text-decoration: underline; }
+
+        @media (max-width: 600px) {
+            .hero h1 { font-size: 32px; }
+            .features-grid { grid-template-columns: 1fr; }
+            .steps { flex-direction: column; }
+            .req-list { flex-direction: column; gap: 8px; }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <div class="logo">Rephraser</div>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#how">How it works</a>
+                <a href="https://github.com/YOUR_USERNAME/Rephraser">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="container">
+            <h1>Rephrase anything.<br>Right on your Mac.</h1>
+            <p class="subtitle">
+                Select text in any app, press one shortcut, get a polished version instantly.
+                Powered by on-device AI. Private. Free. No API keys needed.
+            </p>
+            <div class="shortcut">⌥⇧R</div>
+            <br>
+            <a href="https://github.com/YOUR_USERNAME/Rephraser/releases/latest" class="cta">
+                Download for macOS
+            </a>
+            <span class="cta-note">Requires macOS 14+ and Apple Silicon</span>
+        </div>
+    </section>
+
+    <section class="features" id="features">
+        <div class="container">
+            <div class="features-grid">
+                <div class="feature">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Completely Private</h3>
+                    <p>AI runs entirely on your Mac. Your text never leaves your device. No accounts, no cloud, no tracking.</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Instant & Lightweight</h3>
+                    <p>Lives in your menu bar. One shortcut, instant results. Under 5MB app size, minimal memory footprint.</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🌐</div>
+                    <h3>Works Everywhere</h3>
+                    <p>Slack, Gmail, Notion, VS Code, Discord, Chrome -- any app where you can select text.</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🎯</div>
+                    <h3>Multiple Modes</h3>
+                    <p>Professional, Casual, Concise, Elaborate, Fix Grammar -- or create your own custom modes.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="how" id="how">
+        <div class="container">
+            <h2>How it works</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Select text</h3>
+                    <p>Highlight any text in any application</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Press ⌥⇧R</h3>
+                    <p>The global shortcut triggers rephrasing</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Review & accept</h3>
+                    <p>Preview the result, switch modes, then accept or dismiss</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="modes">
+        <div class="container">
+            <h2>Built-in rephrase modes</h2>
+            <div class="mode-tags">
+                <span class="mode-tag">Professional</span>
+                <span class="mode-tag">Casual</span>
+                <span class="mode-tag">Concise</span>
+                <span class="mode-tag">Elaborate</span>
+                <span class="mode-tag">Fix Grammar</span>
+                <span class="mode-tag">+ Custom modes</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="requirements">
+        <div class="container">
+            <h2>Requirements</h2>
+            <div class="req-list">
+                <span>macOS 14 (Sonoma) or later</span>
+                <span>Apple Silicon (M1+)</span>
+                <span>~3 GB for the AI model</span>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>
+                Rephraser is free and open source.
+                <a href="https://github.com/YOUR_USERNAME/Rephraser">View on GitHub</a>
+            </p>
+        </div>
+    </footer>
+</body>
+</html>
