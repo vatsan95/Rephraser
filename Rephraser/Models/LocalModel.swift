@@ -17,13 +17,21 @@ struct LocalModel: Identifiable, Hashable, Codable {
 enum ModelCatalog {
     static let all: [LocalModel] = [
         LocalModel(
+            id: "gemma-4-e4b-4bit",
+            name: "Gemma 4 E4B",
+            huggingFaceID: "unsloth/gemma-4-E4B-it-UD-MLX-4bit",
+            sizeDescription: "~3 GB",
+            parameterCount: "4.5B",
+            description: "Google's latest Gemma 4 -- best quality for rephrasing",
+            isRecommended: true
+        ),
+        LocalModel(
             id: "gemma-3-4b-it-4bit",
             name: "Gemma 3 4B",
             huggingFaceID: "mlx-community/gemma-3-4b-it-4bit",
             sizeDescription: "~2.5 GB",
             parameterCount: "4B",
-            description: "Google's Gemma 3 -- fast, excellent for rephrasing",
-            isRecommended: true
+            description: "Google's Gemma 3 -- proven, fast, lightweight"
         ),
         LocalModel(
             id: "qwen3-4b-4bit",

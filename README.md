@@ -26,7 +26,8 @@ Download any of these directly from within the app:
 
 | Model | Size | Notes |
 |-------|------|-------|
-| **Gemma 3 4B** (recommended) | ~2.5 GB | Google's Gemma 3 — fast, excellent for rephrasing |
+| **Gemma 4 E4B** (recommended) | ~3 GB | Google's latest Gemma 4 — best quality for rephrasing |
+| Gemma 3 4B | ~2.5 GB | Google's Gemma 3 — proven, fast, lightweight |
 | Qwen 3 4B | ~2.5 GB | Strong multilingual support |
 | Phi-4 Mini | ~2.3 GB | Microsoft — compact and efficient |
 | Llama 3.2 3B | ~1.8 GB | Meta — smallest option, fastest speed |
