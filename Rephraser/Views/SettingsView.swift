@@ -1,4 +1,5 @@
 import SwiftUI
+import ServiceManagement
 import Sparkle
 
 // MARK: - Settings View
@@ -68,7 +69,7 @@ private struct GeneralTab: View {
                         .foregroundStyle(.secondary)
                     Spacer()
                     Button("Check for Updates") {
-                        // Sparkle update check will be wired here
+                        AppDelegate.shared?.updaterController.updater.checkForUpdates()
                     }
                 }
             }
