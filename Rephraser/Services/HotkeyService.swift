@@ -15,7 +15,17 @@ final class HotkeyService {
     /// Register the global hotkey with the given handler
     func register(handler: @escaping () -> Void) {
         self.handler = handler
-        registerDefault()
+    }
+
+    /// Apply a shortcut from saved carbon key code and modifiers
+    func applyShortcut(keyCode: UInt32, modifiers: UInt32) {
+        hotKey = nil
+        let combo = KeyCombo(carbonKeyCode: keyCode, carbonModifiers: modifiers)
+        hotKey = HotKey(keyCombo: combo)
+        hotKey?.keyDownHandler = { [weak self] in
+            self?.handler?()
+        }
+        currentShortcutDisplay = combo.description
     }
 
     /// Register the default shortcut: Option + Shift + R

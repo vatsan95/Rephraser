@@ -58,7 +58,7 @@ struct MenuBarView: View {
 
             Spacer()
 
-            Text(coordinator.hotkeyService.currentShortcutDisplay)
+            Text(appState.shortcutDisplay)
                 .font(.system(.caption, design: .rounded))
                 .padding(.horizontal, 8)
                 .padding(.vertical, 4)

@@ -57,6 +57,18 @@ final class RephraseCoordinator {
         hotkeyService.register { [weak self] in
             self?.triggerRephrase()
         }
+        // Apply the saved shortcut from AppState
+        hotkeyService.applyShortcut(
+            keyCode: appState.shortcutKeyCode,
+            modifiers: appState.shortcutModifiers
+        )
+    }
+
+    /// Update the global shortcut and persist it
+    func updateShortcut(keyCode: UInt32, modifiers: UInt32) {
+        appState.shortcutKeyCode = keyCode
+        appState.shortcutModifiers = modifiers
+        hotkeyService.applyShortcut(keyCode: keyCode, modifiers: modifiers)
     }
 
     // MARK: - Main Flow
