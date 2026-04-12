@@ -238,11 +238,6 @@ final class RephraseCoordinator {
             isStreaming = false
             state = .showingResult
 
-            // Play completion sound if enabled
-            if appState.soundEnabled {
-                NSSound.beep()
-            }
-
         } catch is CancellationError {
             return
         } catch let error as AppError {
@@ -258,17 +253,22 @@ final class RephraseCoordinator {
         // Dismiss the panel first
         RephrasePanel.shared.dismissPanel()
 
-        // Brief delay for panel dismissal animation
-        try? await Task.sleep(for: .milliseconds(100))
+        // Brief delay for panel dismissal
+        try? await Task.sleep(for: .milliseconds(50))
 
         // Re-focus the source app (e.g., Slack) so paste goes to the right place
         sourceTracker.refocusSourceApp()
 
-        // Wait for the source app to regain focus and its text field to be ready
-        try? await Task.sleep(for: .milliseconds(150))
+        // Wait for the source app to regain focus
+        try? await Task.sleep(for: .milliseconds(80))
 
         // Paste the rephrased text (writes to clipboard, simulates Cmd+V, restores clipboard)
         await textCapture.pasteText(streamingText)
+
+        // Play completion sound if enabled
+        if appState.soundEnabled {
+            NSSound(named: .init("Funk"))?.play()
+        }
 
         // Clean up
         sourceTracker.clear()
