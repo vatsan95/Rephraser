@@ -202,15 +202,37 @@ final class RephraseCoordinator {
         do {
             let stream = rephraseService.rephrase(text: text, mode: activeMode)
 
-            for try await chunk in stream {
-                guard !Task.isCancelled else { return }
-                streamingText += chunk
+            try await withThrowingTaskGroup(of: Void.self) { group in
+                // Inference task
+                group.addTask { @MainActor in
+                    for try await chunk in stream {
+                        guard !Task.isCancelled else { return }
+                        self.streamingText += chunk
+                    }
+                }
+
+                // Timeout task (30 seconds)
+                group.addTask {
+                    try await Task.sleep(for: .seconds(30))
+                    throw AppError.inferenceFailed(underlying: "Rephrase timed out after 30 seconds. Try again or use a smaller model.")
+                }
+
+                // Wait for the first to finish, cancel the other
+                try await group.next()
+                group.cancelAll()
             }
 
             guard !Task.isCancelled else { return }
             isStreaming = false
             state = .showingResult
 
+            // Play completion sound if enabled
+            if appState.soundEnabled {
+                NSSound.beep()
+            }
+
+        } catch is CancellationError {
+            return
         } catch let error as AppError {
             guard !Task.isCancelled else { return }
             showError(error)

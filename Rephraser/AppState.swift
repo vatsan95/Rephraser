@@ -1,4 +1,5 @@
 import SwiftUI
+import ServiceManagement
 
 // MARK: - App State
 
@@ -43,7 +44,18 @@ final class AppState {
     }
 
     var launchAtLogin: Bool {
-        didSet { UserDefaults.standard.set(launchAtLogin, forKey: "launchAtLogin") }
+        didSet {
+            UserDefaults.standard.set(launchAtLogin, forKey: "launchAtLogin")
+            do {
+                if launchAtLogin {
+                    try SMAppService.mainApp.register()
+                } else {
+                    try SMAppService.mainApp.unregister()
+                }
+            } catch {
+                // Silently fail — user can retry from Settings
+            }
+        }
     }
 
     // MARK: - Onboarding
