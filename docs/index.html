@@ -5,6 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rephraser — Rewrite anything without switching apps</title>
     <meta name="description" content="On-device AI text rewriting for macOS. Select text, press a shortcut, done. No cloud, no API keys, no cost.">
+    <meta name="theme-color" content="#0a0a0a">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Rephraser — Rewrite anything without switching apps">
+    <meta property="og:description" content="On-device AI text rewriting for macOS. Select text, press a shortcut, done. No cloud, no API keys, no cost.">
+    <meta property="og:url" content="https://vatsan95.github.io/Rephraser/">
+    <meta property="og:site_name" content="Rephraser">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Rephraser — Rewrite anything without switching apps">
+    <meta name="twitter:description" content="On-device AI text rewriting for macOS. Select text, press a shortcut, done. No cloud, no API keys, no cost.">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
@@ -49,24 +66,27 @@
             background: var(--text); color: var(--bg); transition: opacity 0.15s;
         }
         .nav-btn:hover { opacity: 0.85; }
+        .nav-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+        .nav-btn:active { transform: scale(0.97); }
 
         /* ---- Hero ---- */
         .hero {
             max-width: 760px; margin: 0 auto; padding: 160px 40px 80px;
             text-align: center;
         }
-        .hero h1 {
-            font-size: 52px; font-weight: 800; letter-spacing: -2.5px;
-            line-height: 1.08;
-        }
-        .hero h1 .d { color: var(--dim); }
         .hero-privacy {
-            display: inline-block; margin-top: 20px;
+            display: inline-block;
             font-size: 13px; font-weight: 500; letter-spacing: 0.02em;
             color: var(--accent); padding: 5px 14px;
             border: 1px solid rgba(59,130,246,0.2); border-radius: 20px;
             background: rgba(59,130,246,0.05);
         }
+        .hero h1 {
+            margin-top: 20px;
+            font-size: 52px; font-weight: 800; letter-spacing: -2.5px;
+            line-height: 1.08;
+        }
+        .hero h1 .d { color: var(--dim); }
         .hero p {
             margin-top: 24px; font-size: 17px; color: var(--dim);
             line-height: 1.7; max-width: 520px; margin-left: auto; margin-right: auto;
@@ -78,16 +98,21 @@
             background: #fff; color: #0a0a0a; transition: transform 0.1s, box-shadow 0.15s;
         }
         .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(255,255,255,0.06); }
+        .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
         .btn svg { width: 16px; height: 16px; }
-        .hero-meta { font-size: 12px; color: var(--faint); }
+        .hero-meta { font-size: 12px; color: var(--dim); }
         .hero-apps {
             margin-top: 40px; display: flex; justify-content: center; gap: 6px; flex-wrap: wrap;
         }
-        .ha { font-size: 11px; color: var(--faint); padding: 3px 10px; border: 1px solid var(--border); border-radius: 5px; }
+        .ha { font-size: 11px; color: #71717a; padding: 3px 10px; border: 1px solid #27272a; border-radius: 5px; }
 
         /* ---- Section frames ---- */
         .s { border-top: 1px solid var(--border); }
         .s-inner { max-width: 1200px; margin: 0 auto; padding: 96px 40px; }
+
+        /* ---- Section headings ---- */
+        .section-h { font-size: 36px; font-weight: 800; letter-spacing: -1.5px; }
+        .section-sub { font-size: 15px; color: var(--dim); margin-top: 12px; }
 
         /* ---- How it works ---- */
         .how-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border-radius: 16px; overflow: hidden; margin-top: 56px; }
@@ -154,6 +179,15 @@
         footer .f-links { display: flex; gap: 20px; }
         footer a { font-size: 12px; color: var(--dim); transition: color 0.15s; }
         footer a:hover { color: var(--text); }
+
+        /* ---- Scroll animations ---- */
+        .fade-in {
+            opacity: 0; transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        .fade-in.visible {
+            opacity: 1; transform: translateY(0);
+        }
 
         /* ---- Responsive ---- */
         @media (max-width: 900px) {
@@ -223,24 +257,24 @@
 
 <!-- How it works -->
 <div class="s">
-    <div class="s-inner" style="text-align:center;">
-        <h2 style="font-size:36px; font-weight:800; letter-spacing:-1.5px;">Three steps. Two seconds.</h2>
-        <p style="font-size:15px; color:var(--dim); margin-top:12px;">No menus, no context switching, no copy-pasting into ChatGPT.</p>
+    <div class="s-inner fade-in" style="text-align:center;">
+        <h2 class="section-h">Three steps. Two seconds.</h2>
+        <p class="section-sub">No menus, no context switching, no copy-pasting into ChatGPT.</p>
         <div class="how-grid">
             <div class="how-cell">
                 <div class="how-n">Step 01</div>
                 <h3>Select text</h3>
-                <p>Highlight text in any application. Email, Slack, a Google Doc, your IDE — anywhere with a text cursor.</p>
+                <p>Highlight text in any app — email, Slack, a Google Doc, your IDE.</p>
             </div>
             <div class="how-cell">
                 <div class="how-n">Step 02</div>
                 <h3>Press your shortcut</h3>
-                <p>Hit ⌥⇧R (or whatever you've set). A floating panel appears and your rephrased text streams in real time.</p>
+                <p>Hit &#x2325;&#x21E7;R (or your custom combo). A floating panel streams the result in real time.</p>
             </div>
             <div class="how-cell">
                 <div class="how-n">Step 03</div>
                 <h3>Accept or switch</h3>
-                <p>Enter to replace, Escape to cancel. Change modes or toggle diff view to see exactly what changed before deciding.</p>
+                <p>Enter to replace, Escape to cancel. Toggle diff view or change modes before deciding.</p>
             </div>
         </div>
     </div>
@@ -248,58 +282,58 @@
 
 <!-- Features -->
 <div class="s" id="features">
-    <div class="s-inner">
-        <h2 style="font-size:36px; font-weight:800; letter-spacing:-1.5px;">Built for people who write all day.</h2>
-        <p style="font-size:15px; color:var(--dim); margin-top:12px; max-width:560px;">Every feature exists because switching to ChatGPT for a two-sentence rewrite is absurd.</p>
+    <div class="s-inner fade-in">
+        <h2 class="section-h">Built for people who write all day.</h2>
+        <p class="section-sub" style="max-width:560px;">Every feature exists because switching to ChatGPT for a two-sentence rewrite is absurd.</p>
 
         <div class="feat-list">
             <div class="feat-row">
                 <h3>On-device AI</h3>
-                <p>Runs via Apple MLX directly on your Apple Silicon chip. No servers, no cloud, no API keys. Your text never leaves your machine. Not even for a millisecond.</p>
+                <p>Runs via Apple MLX directly on your Apple Silicon chip. No servers, no cloud, no API keys. Your text never leaves your machine.</p>
             </div>
             <div class="feat-row">
                 <h3>Works in every app</h3>
-                <p>System-wide via clipboard capture. Slack, Gmail, Notion, VS Code, Chrome, Discord, Pages, Notes — any app where you can select text. No plugins or extensions needed.</p>
+                <p>System-wide via clipboard capture. Slack, Gmail, Notion, VS Code, Chrome, Discord, Pages, Notes — any app where you can select text.</p>
             </div>
             <div class="feat-row">
                 <h3>Context-aware modes</h3>
-                <p>Automatically picks the right tone based on your app. Slack gets casual, Gmail gets professional, VS Code gets grammar-only. Override with one click in the panel.</p>
+                <p>Automatically picks the right tone based on your app. Slack gets casual, Gmail gets professional, VS Code gets grammar-only.</p>
             </div>
             <div class="feat-row">
                 <h3>Real-time streaming</h3>
-                <p>Results appear token-by-token as they generate. First token in under 2 seconds on M1, faster on newer chips. A "Generating..." indicator keeps you informed.</p>
+                <p>Results appear token-by-token as they generate. First token in under 2 seconds on M1, faster on newer chips.</p>
             </div>
             <div class="feat-row">
                 <h3>Before / after diff view</h3>
-                <p>Toggle the diff view in the panel to see your original text alongside the rephrased version with color-coded highlighting. Know exactly what changed before accepting.</p>
+                <p>Toggle diff view to see your original alongside the rephrased version with color-coded highlighting. Know exactly what changed.</p>
             </div>
             <div class="feat-row">
                 <h3>9 built-in modes + custom</h3>
-                <p>Professional, Casual, Concise, Elaborate, Fix Grammar, Confident, Empathetic, Summarize, Key Points. Create unlimited custom modes with your own system prompts.</p>
+                <p>Professional, Casual, Concise, Elaborate, Fix Grammar, Confident, Empathetic, Summarize, Key Points. Create your own with custom system prompts.</p>
             </div>
             <div class="feat-row">
                 <h3>Custom keyboard shortcut</h3>
-                <p>Change the shortcut to any key combination in Settings. Record Cmd, Option, Shift, Ctrl + any key. Reset to default with one click.</p>
+                <p>Record any key combination in Settings — Cmd, Option, Shift, Ctrl + any key. Reset to default with one click.</p>
             </div>
             <div class="feat-row">
                 <h3>Choose your AI model</h3>
-                <p>Download and switch between Gemma 4, Gemma 3, Qwen 3, Phi-4, and Llama 3.2 — all managed inside the app. No terminal, no Homebrew, no Ollama setup.</p>
+                <p>Download and switch between Gemma 4, Gemma 3, Qwen 3, Phi-4, and Llama 3.2. All managed inside the app — no terminal needed.</p>
             </div>
             <div class="feat-row">
                 <h3>Full clipboard preservation</h3>
-                <p>Saves and restores your entire clipboard — images, files, rich text, everything — through the whole rephrase flow. Nothing gets lost.</p>
+                <p>Saves and restores your entire clipboard — images, files, rich text — through the whole rephrase flow. Nothing gets lost.</p>
             </div>
             <div class="feat-row">
                 <h3>Works completely offline</h3>
-                <p>Once the model is downloaded, zero internet needed. Airplanes, coffee shops, VPN tunnels — works anywhere your Mac works.</p>
+                <p>Once the model downloads, zero internet needed. Airplanes, coffee shops, VPN tunnels — works anywhere your Mac does.</p>
             </div>
             <div class="feat-row">
                 <h3>30-second timeout safety</h3>
-                <p>If the model hangs or takes too long, inference is automatically cancelled with a clear error and retry option. No frozen UI.</p>
+                <p>If the model hangs, inference is automatically cancelled with a clear error and retry option. No frozen UI.</p>
             </div>
             <div class="feat-row">
                 <h3>Launch at login + sound feedback</h3>
-                <p>Starts automatically and lives in your menu bar. Optional sound confirms when text is pasted back. Toggle both in Settings.</p>
+                <p>Starts automatically and lives in your menu bar. Optional sound confirms when text is pasted back.</p>
             </div>
         </div>
     </div>
@@ -307,10 +341,10 @@
 
 <!-- Compare -->
 <div class="s" id="compare">
-    <div class="s-inner">
+    <div class="s-inner fade-in">
         <div class="cmp-layout">
             <div class="cmp-text">
-                <h2>Why not Apple Intelligence?</h2>
+                <h2>Rephraser vs Apple Intelligence</h2>
                 <p>Apple's Writing Tools give you 3 fixed tones, route complex requests through cloud servers, fail in WhatsApp and web editors, and are blocked in China.</p>
                 <p style="margin-top:16px;">Rephraser gives you 9 modes, custom prompts, model choice, context-aware suggestions, diff view, and works in every app. All on your device.</p>
             </div>
@@ -332,9 +366,9 @@
 
 <!-- Modes -->
 <div class="s">
-    <div class="s-inner">
-        <h2 style="font-size:36px; font-weight:800; letter-spacing:-1.5px;">9 modes. Unlimited custom ones.</h2>
-        <p style="font-size:15px; color:var(--dim); margin-top:12px; max-width:520px;">Apple gives you Friendly, Professional, and Concise. Rephraser ships with 9 — and you can write your own system prompts for anything else.</p>
+    <div class="s-inner fade-in">
+        <h2 class="section-h">9 modes. Unlimited custom ones.</h2>
+        <p class="section-sub" style="max-width:520px;">Apple gives you Friendly, Professional, and Concise. Rephraser ships with 9 — and you can write your own system prompts for anything else.</p>
         <div class="modes-wrap">
             <span class="m">Professional</span>
             <span class="m">Casual</span>
@@ -352,9 +386,9 @@
 
 <!-- Models -->
 <div class="s">
-    <div class="s-inner">
-        <h2 style="font-size:36px; font-weight:800; letter-spacing:-1.5px;">Pick your model.</h2>
-        <p style="font-size:15px; color:var(--dim); margin-top:12px; max-width:520px;">Gemma 4 downloads automatically on first launch. Swap anytime in Settings — no terminal needed.</p>
+    <div class="s-inner fade-in">
+        <h2 class="section-h">Pick your model.</h2>
+        <p class="section-sub" style="max-width:520px;">Gemma 4 downloads automatically on first launch. Swap anytime in Settings — no terminal needed.</p>
         <div class="mod-grid">
             <div class="mc rec">
                 <h4>Gemma 4 E4B <span class="tag">Default</span></h4>
@@ -377,7 +411,7 @@
 </div>
 
 <!-- CTA -->
-<div class="bottom-cta">
+<div class="bottom-cta fade-in">
     <h2>Stop copy-pasting<br><span class="d">into ChatGPT.</span></h2>
     <p>One shortcut. Nine modes. Fully private. Runs on your Mac.</p>
     <a href="https://github.com/vatsan95/Rephraser#build--run" class="btn">
@@ -388,12 +422,21 @@
 </div>
 
 <footer>
-    <span>Rephraser · macOS</span>
+    <span>&copy; 2025 Rephraser · macOS</span>
     <div class="f-links">
         <a href="https://github.com/vatsan95/Rephraser">GitHub</a>
+        <a href="https://github.com/vatsan95/Rephraser/releases">Releases</a>
         <a href="https://github.com/vatsan95/Rephraser/issues">Feedback</a>
     </div>
 </footer>
+
+<!-- Scroll fade-in -->
+<script>
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
 
 </body>
 </html>
