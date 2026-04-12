@@ -3,24 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rephraser — Rewrite anything without switching apps</title>
-    <meta name="description" content="On-device AI text rewriting for macOS. Select text, press a shortcut, done. No cloud, no API keys, no cost.">
+    <title>Rephraser — Free AI Text Rewriter for macOS | On-Device, Private, Offline</title>
+    <meta name="description" content="Free on-device AI text rewriting app for macOS. Rephrase, rewrite, and fix grammar in any app with a keyboard shortcut. 100% private — runs locally on Apple Silicon via MLX. No cloud, no API keys, no subscription.">
+    <meta name="keywords" content="text rewriter mac, rephrase tool macOS, AI writing assistant mac, grammar fixer mac, on-device AI mac, private AI writing tool, Apple Silicon AI app, MLX AI app, free paraphrasing tool mac, rewrite text offline, Apple Intelligence alternative, writing tools mac">
     <meta name="theme-color" content="#0a0a0a">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://vatsan95.github.io/Rephraser/">
 
     <!-- Open Graph -->
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Rephraser — Rewrite anything without switching apps">
-    <meta property="og:description" content="On-device AI text rewriting for macOS. Select text, press a shortcut, done. No cloud, no API keys, no cost.">
+    <meta property="og:title" content="Rephraser — Free AI Text Rewriter for macOS">
+    <meta property="og:description" content="Rephrase text in any Mac app with one shortcut. 100% on-device AI — no cloud, no API keys, no cost. 9 writing modes, diff view, works offline.">
     <meta property="og:url" content="https://vatsan95.github.io/Rephraser/">
     <meta property="og:site_name" content="Rephraser">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Rephraser — Rewrite anything without switching apps">
-    <meta name="twitter:description" content="On-device AI text rewriting for macOS. Select text, press a shortcut, done. No cloud, no API keys, no cost.">
+    <meta name="twitter:title" content="Rephraser — Free AI Text Rewriter for macOS">
+    <meta name="twitter:description" content="Rephrase text in any Mac app with one shortcut. 100% on-device AI — no cloud, no API keys, no cost. 9 writing modes, diff view, works offline.">
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="apple-touch-icon" href="favicon.svg">
+
+    <!-- Structured Data: SoftwareApplication -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "Rephraser",
+        "description": "Free on-device AI text rewriting app for macOS. Rephrase, rewrite, and fix grammar in any app with a keyboard shortcut. Runs locally on Apple Silicon.",
+        "applicationCategory": "UtilitiesApplication",
+        "operatingSystem": "macOS 14+",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "softwareVersion": "1.0.0",
+        "processorRequirements": "Apple Silicon (M1 or later)",
+        "url": "https://vatsan95.github.io/Rephraser/",
+        "downloadUrl": "https://github.com/user-attachments/files/26660628/Rephraser-macOS.zip",
+        "featureList": "On-device AI, 9 rephrase modes, context-aware tone, diff view, custom keyboard shortcut, works offline, clipboard preservation, multiple AI models"
+    }
+    </script>
+
+    <!-- Structured Data: FAQPage -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "Is Rephraser free?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes, Rephraser is completely free. There are no subscriptions, API keys, or hidden costs."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Does Rephraser send my text to the cloud?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "No. Rephraser runs 100% on your Mac using Apple MLX. Your text never leaves your device — not even for a millisecond."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How is Rephraser different from Apple Intelligence Writing Tools?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Rephraser offers 9 writing modes (vs Apple's 3), works in every app (Apple's fails in WhatsApp and many web editors), lets you choose your AI model, includes a diff view, supports custom keyboard shortcuts, and is available worldwide including regions where Apple Intelligence is blocked."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Does Rephraser work offline?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes. After the initial AI model download (~3 GB), Rephraser works fully offline with no internet connection required."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What Mac do I need to run Rephraser?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Rephraser requires macOS 14 (Sonoma) or later and an Apple Silicon chip (M1, M2, M3, M4 or later). It needs about 3 GB of disk space for the AI model."
+                }
+            }
+        ]
+    }
+    </script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -176,6 +252,21 @@
         .mc p { font-size: 12px; color: var(--dim); }
         .tag { font-size: 10px; font-weight: 700; background: rgba(59,130,246,0.12); color: var(--accent); padding: 2px 7px; border-radius: 4px; margin-left: 5px; vertical-align: 1px; }
 
+        /* ---- FAQ ---- */
+        .faq-list { margin-top: 40px; }
+        .faq { border-bottom: 1px solid var(--border); }
+        .faq:first-child { border-top: 1px solid var(--border); }
+        .faq summary {
+            padding: 20px 0; font-size: 15px; font-weight: 600; cursor: pointer;
+            list-style: none; display: flex; align-items: center; justify-content: space-between;
+            transition: color 0.15s;
+        }
+        .faq summary::-webkit-details-marker { display: none; }
+        .faq summary::after { content: '+'; font-size: 18px; color: var(--dim); transition: transform 0.2s; }
+        .faq[open] summary::after { content: '−'; }
+        .faq summary:hover { color: var(--accent); }
+        .faq p { padding: 0 0 20px; font-size: 14px; color: var(--dim); line-height: 1.7; max-width: 640px; }
+
         /* ---- Bottom CTA ---- */
         .bottom-cta {
             border-top: 1px solid var(--border); text-align: center;
@@ -301,7 +392,7 @@
 </nav>
 
 <!-- Hero -->
-<div class="hero">
+<header class="hero">
     <div class="hero-privacy">Your text never leaves your Mac</div>
     <h1>Rewrite anything.<br><span class="d">Without switching apps.</span></h1>
     <p>Select text anywhere on your Mac, press a shortcut, get a better version in seconds. AI runs entirely on your device — no cloud, no API keys, no accounts.</p>
@@ -329,10 +420,10 @@
         <span class="ha">Notes</span>
         <span class="ha">Any app</span>
     </div>
-</div>
+</header>
 
 <!-- How it works -->
-<div class="s">
+<section class="s" aria-label="How it works">
     <div class="s-inner fade-in" style="text-align:center;">
         <h2 class="section-h">Three steps. Two seconds.</h2>
         <p class="section-sub">No menus, no context switching, no copy-pasting into ChatGPT.</p>
@@ -354,10 +445,10 @@
             </div>
         </div>
     </div>
-</div>
+</section>
 
 <!-- Features -->
-<div class="s" id="features">
+<section class="s" id="features" aria-label="Features">
     <div class="s-inner fade-in">
         <h2 class="section-h">Everything else you get.</h2>
 
@@ -412,10 +503,10 @@
             </div>
         </div>
     </div>
-</div>
+</section>
 
 <!-- Compare -->
-<div class="s" id="compare">
+<section class="s" id="compare" aria-label="Comparison with Apple Intelligence">
     <div class="s-inner fade-in">
         <div class="cmp-layout">
             <div class="cmp-text">
@@ -437,12 +528,12 @@
             </div>
         </div>
     </div>
-</div>
+</section>
 
 <!-- Modes -->
-<div class="s">
+<section class="s" aria-label="Writing modes">
     <div class="s-inner fade-in">
-        <h2 class="section-h">9 modes. Unlimited custom ones.</h2>
+        <h2 class="section-h">9 writing modes. Unlimited custom ones.</h2>
         <p class="section-sub" style="max-width:520px;">Apple gives you Friendly, Professional, and Concise. Rephraser ships with 9 — and you can write your own system prompts for anything else.</p>
         <div class="modes-wrap">
             <span class="m">Professional</span>
@@ -457,12 +548,12 @@
             <span class="m hi">+ Your custom modes</span>
         </div>
     </div>
-</div>
+</section>
 
 <!-- Models -->
-<div class="s">
+<section class="s" aria-label="AI models">
     <div class="s-inner fade-in">
-        <h2 class="section-h">Pick your model.</h2>
+        <h2 class="section-h">Pick your AI model.</h2>
         <p class="section-sub" style="max-width:520px;">Gemma 4 downloads automatically on first launch. Swap anytime in Settings — no terminal needed.</p>
         <div class="mod-grid">
             <div class="mc rec">
@@ -483,10 +574,10 @@
             </div>
         </div>
     </div>
-</div>
+</section>
 
 <!-- CTA -->
-<div class="bottom-cta fade-in">
+<section class="bottom-cta fade-in" aria-label="Download">
     <h2>Stop copy-pasting<br><span class="d">into ChatGPT.</span></h2>
     <p>One shortcut. Nine modes. Fully private. Runs on your Mac.</p>
     <a href="https://github.com/user-attachments/files/26660628/Rephraser-macOS.zip" class="btn">
@@ -494,7 +585,40 @@
         Download for Mac
     </a>
     <p style="font-size:12px; color:var(--faint); margin-top:16px;">macOS 14 (Sonoma) · Apple Silicon (M1+) · ~3 GB for AI model</p>
-</div>
+</section>
+
+<!-- FAQ -->
+<section class="s" id="faq" aria-label="Frequently asked questions">
+    <div class="s-inner fade-in">
+        <h2 class="section-h">Frequently asked questions</h2>
+        <div class="faq-list">
+            <details class="faq">
+                <summary>Is Rephraser free?</summary>
+                <p>Yes. Rephraser is completely free — no subscriptions, no API keys, no hidden costs. The AI model runs locally on your Mac.</p>
+            </details>
+            <details class="faq">
+                <summary>Does Rephraser send my text to the cloud?</summary>
+                <p>Never. Rephraser runs 100% on your device using Apple MLX. Your text never leaves your Mac — not even for analytics or telemetry.</p>
+            </details>
+            <details class="faq">
+                <summary>How is this different from Apple Intelligence?</summary>
+                <p>Apple's Writing Tools offer 3 fixed tones, fail in many apps like WhatsApp, route complex requests to the cloud, and are blocked in some countries. Rephraser offers 9 modes plus custom ones, works in every app, stays fully on-device, includes a diff view, and is available worldwide.</p>
+            </details>
+            <details class="faq">
+                <summary>Does it work offline?</summary>
+                <p>Yes. After the initial model download (~3 GB), Rephraser works with zero internet. Airplanes, coffee shops, VPN tunnels — anywhere your Mac works.</p>
+            </details>
+            <details class="faq">
+                <summary>What Mac do I need?</summary>
+                <p>macOS 14 (Sonoma) or later with Apple Silicon (M1, M2, M3, M4 or later). About 3 GB of free disk space for the AI model.</p>
+            </details>
+            <details class="faq">
+                <summary>Can I use my own writing style or custom prompts?</summary>
+                <p>Yes. Beyond the 9 built-in modes, you can create unlimited custom modes with your own system prompts to match any writing style or use case.</p>
+            </details>
+        </div>
+    </div>
+</section>
 
 <footer>
     <span>&copy; 2025 Rephraser · macOS</span>
