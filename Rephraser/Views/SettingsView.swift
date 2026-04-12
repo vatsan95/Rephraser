@@ -1,6 +1,8 @@
 import SwiftUI
 import ServiceManagement
 import Sparkle
+import HotKey
+import Carbon
 
 // MARK: - Settings View
 
@@ -33,6 +35,8 @@ struct SettingsView: View {
 
 private struct GeneralTab: View {
     @Bindable var appState: AppState
+    @State private var isRecording = false
+    @State private var recordedDisplay = ""
 
     var body: some View {
         Form {
@@ -40,12 +44,59 @@ private struct GeneralTab: View {
                 HStack {
                     Text("Rephrase shortcut:")
                     Spacer()
-                    Text("⌥⇧R")
-                        .font(.system(.body, design: .rounded))
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(.quaternary)
-                        .clipShape(RoundedRectangle(cornerRadius: 6))
+
+                    if isRecording {
+                        Text(recordedDisplay.isEmpty ? "Press keys..." : recordedDisplay)
+                            .font(.system(.body, design: .rounded))
+                            .foregroundStyle(recordedDisplay.isEmpty ? .secondary : .primary)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(Color.accentColor.opacity(0.15))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 6)
+                                    .stroke(Color.accentColor, lineWidth: 1.5)
+                            )
+                            .clipShape(RoundedRectangle(cornerRadius: 6))
+                    } else {
+                        Text(appState.shortcutDisplay)
+                            .font(.system(.body, design: .rounded))
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(.quaternary)
+                            .clipShape(RoundedRectangle(cornerRadius: 6))
+                            .onTapGesture { isRecording = true }
+                    }
+
+                    if isRecording {
+                        Button("Cancel") {
+                            isRecording = false
+                            recordedDisplay = ""
+                        }
+                        .controlSize(.small)
+                    } else {
+                        Button("Change") {
+                            isRecording = true
+                        }
+                        .controlSize(.small)
+                    }
+                }
+                .background(
+                    ShortcutRecorderView(
+                        isRecording: $isRecording,
+                        recordedDisplay: $recordedDisplay,
+                        appState: appState
+                    )
+                    .frame(width: 0, height: 0)
+                )
+
+                if appState.shortcutDisplay != "⌥⇧R" {
+                    Button("Reset to Default (⌥⇧R)") {
+                        let coordinator = AppDelegate.shared?.coordinator
+                        let defaultKeyCode = Key.r.carbonKeyCode
+                        let defaultModifiers = NSEvent.ModifierFlags([.option, .shift]).carbonFlags
+                        coordinator?.updateShortcut(keyCode: defaultKeyCode, modifiers: defaultModifiers)
+                    }
+                    .controlSize(.small)
                 }
             }
 
@@ -311,4 +362,101 @@ private struct ModesTab: View {
             }
         )
     }
+}
+
+// MARK: - Shortcut Recorder
+
+/// Invisible NSView that captures key events when recording mode is active.
+private struct ShortcutRecorderView: NSViewRepresentable {
+    @Binding var isRecording: Bool
+    @Binding var recordedDisplay: String
+    let appState: AppState
+
+    func makeNSView(context: Context) -> NSView {
+        let view = ShortcutCaptureNSView()
+        view.delegate = context.coordinator
+        return view
+    }
+
+    func updateNSView(_ nsView: NSView, context: Context) {
+        context.coordinator.isRecording = isRecording
+        if isRecording {
+            context.coordinator.startMonitoring()
+        } else {
+            context.coordinator.stopMonitoring()
+        }
+    }
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(isRecording: $isRecording, recordedDisplay: $recordedDisplay, appState: appState)
+    }
+
+    class Coordinator {
+        var isRecording = false
+        private var monitor: Any?
+        private var isRecordingBinding: Binding<Bool>
+        private var recordedDisplayBinding: Binding<String>
+        private let appState: AppState
+
+        init(isRecording: Binding<Bool>, recordedDisplay: Binding<String>, appState: AppState) {
+            self.isRecordingBinding = isRecording
+            self.recordedDisplayBinding = recordedDisplay
+            self.appState = appState
+        }
+
+        func startMonitoring() {
+            guard monitor == nil else { return }
+            monitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
+                guard let self, self.isRecording else { return event }
+
+                let modifiers = event.modifierFlags.intersection([.command, .option, .shift, .control])
+
+                // Escape cancels recording
+                if event.keyCode == UInt16(kVK_Escape) {
+                    DispatchQueue.main.async {
+                        self.isRecordingBinding.wrappedValue = false
+                        self.recordedDisplayBinding.wrappedValue = ""
+                    }
+                    return nil
+                }
+
+                // Require at least one modifier key
+                guard !modifiers.isEmpty else { return nil }
+
+                // Must have a valid non-modifier key
+                guard let key = Key(carbonKeyCode: UInt32(event.keyCode)) else { return nil }
+                // Skip if the key itself is a modifier
+                let modifierKeys: [Key] = [.command, .shift, .option, .control,
+                                            .rightCommand, .rightShift, .rightOption, .rightControl]
+                guard !modifierKeys.contains(key) else { return nil }
+
+                let carbonKeyCode = UInt32(event.keyCode)
+                let carbonModifiers = modifiers.carbonFlags
+
+                DispatchQueue.main.async {
+                    let coordinator = AppDelegate.shared?.coordinator
+                    coordinator?.updateShortcut(keyCode: carbonKeyCode, modifiers: carbonModifiers)
+                    self.isRecordingBinding.wrappedValue = false
+                    self.recordedDisplayBinding.wrappedValue = ""
+                }
+
+                return nil // Swallow the event
+            }
+        }
+
+        func stopMonitoring() {
+            if let monitor {
+                NSEvent.removeMonitor(monitor)
+            }
+            monitor = nil
+        }
+
+        deinit {
+            stopMonitoring()
+        }
+    }
+}
+
+private class ShortcutCaptureNSView: NSView {
+    weak var delegate: ShortcutRecorderView.Coordinator?
 }

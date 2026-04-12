@@ -1,5 +1,6 @@
 import SwiftUI
 import ServiceManagement
+import HotKey
 
 // MARK: - App State
 
@@ -58,6 +59,24 @@ final class AppState {
         }
     }
 
+    // MARK: - Keyboard Shortcut
+
+    /// Carbon key code for the global shortcut (default: R = 15)
+    var shortcutKeyCode: UInt32 {
+        didSet { UserDefaults.standard.set(Int(shortcutKeyCode), forKey: "shortcutKeyCode") }
+    }
+
+    /// Carbon modifier flags for the global shortcut (default: Option+Shift)
+    var shortcutModifiers: UInt32 {
+        didSet { UserDefaults.standard.set(Int(shortcutModifiers), forKey: "shortcutModifiers") }
+    }
+
+    /// Human-readable display of the current shortcut
+    var shortcutDisplay: String {
+        let combo = KeyCombo(carbonKeyCode: shortcutKeyCode, carbonModifiers: shortcutModifiers)
+        return combo.description
+    }
+
     // MARK: - Onboarding
 
     var isOnboardingComplete: Bool {
@@ -106,6 +125,14 @@ final class AppState {
         } else {
             self.enabledPresetModes = Set(RephraseMode.allPresets.map { $0.id })
         }
+
+        // Load keyboard shortcut (default: Option+Shift+R)
+        let defaultKeyCode = Key.r.carbonKeyCode
+        let defaultModifiers = NSEvent.ModifierFlags([.option, .shift]).carbonFlags
+        let savedKeyCode = defaults.object(forKey: "shortcutKeyCode") as? Int
+        let savedModifiers = defaults.object(forKey: "shortcutModifiers") as? Int
+        self.shortcutKeyCode = UInt32(savedKeyCode ?? Int(defaultKeyCode))
+        self.shortcutModifiers = UInt32(savedModifiers ?? Int(defaultModifiers))
 
         // Load behavior
         self.soundEnabled = defaults.bool(forKey: "soundEnabled")
