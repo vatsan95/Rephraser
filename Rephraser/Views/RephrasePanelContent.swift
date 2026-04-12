@@ -7,6 +7,7 @@ struct RephrasePanelContent: View {
     var coordinator: RephraseCoordinator
 
     @State private var selectedMode: RephraseMode = .professional
+    @State private var showDiff = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -21,7 +22,11 @@ struct RephrasePanelContent: View {
                 case .capturing:
                     capturingView
                 case .rephrasing, .showingResult:
-                    resultView
+                    if showDiff && !coordinator.originalText.isEmpty && !coordinator.streamingText.isEmpty {
+                        diffView
+                    } else {
+                        resultView
+                    }
                 case .showingError:
                     errorView
                 default:
@@ -103,6 +108,58 @@ struct RephrasePanelContent: View {
         }
     }
 
+    private var diffView: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 12) {
+                // Original
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("ORIGINAL")
+                        .font(.caption2)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.secondary)
+                    Text(coordinator.originalText)
+                        .font(.system(size: 13))
+                        .lineSpacing(3)
+                        .foregroundStyle(.secondary)
+                        .padding(10)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(Color.red.opacity(0.05))
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 6)
+                                .stroke(Color.red.opacity(0.15), lineWidth: 1)
+                        )
+                }
+
+                // Arrow
+                Image(systemName: "arrow.down")
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
+                    .frame(maxWidth: .infinity)
+
+                // Rephrased
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("REPHRASED")
+                        .font(.caption2)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.secondary)
+                    Text(coordinator.streamingText)
+                        .font(.system(size: 13))
+                        .lineSpacing(3)
+                        .padding(10)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(Color.green.opacity(0.05))
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 6)
+                                .stroke(Color.green.opacity(0.15), lineWidth: 1)
+                        )
+                }
+            }
+            .padding(16)
+        }
+    }
+
     private var errorView: some View {
         VStack(spacing: 12) {
             Image(systemName: "exclamationmark.triangle.fill")
@@ -126,8 +183,21 @@ struct RephrasePanelContent: View {
 
     private var footerView: some View {
         HStack {
-            if coordinator.state != .showingError {
-                // Keyboard shortcut hints
+            if coordinator.state == .showingResult || coordinator.state == .rephrasing {
+                // Diff toggle
+                Button {
+                    showDiff.toggle()
+                } label: {
+                    Image(systemName: showDiff ? "doc.text" : "arrow.left.arrow.right")
+                        .font(.caption)
+                }
+                .buttonStyle(.borderless)
+                .help(showDiff ? "Show result" : "Show changes")
+
+                Text("Enter to accept  ·  Esc to cancel")
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
+            } else if coordinator.state != .showingError {
                 Text("Enter to accept  ·  Esc to cancel")
                     .font(.caption)
                     .foregroundStyle(.tertiary)
