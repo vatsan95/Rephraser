@@ -16,6 +16,14 @@ struct MenuBarView: View {
             Divider()
                 .padding(.vertical, 4)
 
+            // Download progress (if downloading)
+            if modelManager.isDownloading {
+                downloadSection
+
+                Divider()
+                    .padding(.vertical, 4)
+            }
+
             // Quick mode switcher
             modeSection
 
@@ -57,6 +65,21 @@ struct MenuBarView: View {
                 .background(.quaternary)
                 .clipShape(RoundedRectangle(cornerRadius: 4))
         }
+    }
+
+    private var downloadSection: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("Downloading AI model...")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+            ProgressView(value: modelManager.downloadProgress)
+
+            Text("\(Int(modelManager.downloadProgress * 100))% complete")
+                .font(.caption2)
+                .foregroundStyle(.tertiary)
+        }
+        .padding(.horizontal, 4)
     }
 
     private var modeSection: some View {
@@ -118,7 +141,6 @@ struct MenuBarView: View {
         .padding(.vertical, 5)
         .contentShape(Rectangle())
         .onTapGesture {
-            // Use DispatchQueue to escape the MenuBarExtra context before opening the window
             DispatchQueue.main.async {
                 AppDelegate.shared?.openSettings()
             }
@@ -143,6 +165,9 @@ struct MenuBarView: View {
     // MARK: - Status
 
     private var statusColor: Color {
+        if modelManager.isDownloading {
+            return .orange
+        }
         if !AccessibilityHelper.shared.isAccessibilityGranted {
             return .orange
         }
@@ -156,6 +181,9 @@ struct MenuBarView: View {
     }
 
     private var statusText: String {
+        if modelManager.isDownloading {
+            return "Downloading model..."
+        }
         if !AccessibilityHelper.shared.isAccessibilityGranted {
             return "Accessibility permission needed"
         }
