@@ -45,18 +45,29 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Setup the coordinator (registers hotkey)
         coordinator.setup()
 
-        // Auto-load the previously selected model
-        if let model = appState.selectedModel, modelManager.isDownloaded(model) {
-            Task {
-                try? await modelManager.loadModel(model)
+        if appState.isOnboardingComplete {
+            // Returning user: auto-load the previously selected model
+            if let model = appState.selectedModel, modelManager.isDownloaded(model) {
+                Task { try? await modelManager.loadModel(model) }
+            } else if !modelManager.isModelLoaded {
+                // Model was deleted or missing — auto-download the recommended one
+                autoDownloadRecommended()
             }
-        }
-
-        // Show onboarding on first launch
-        if !appState.isOnboardingComplete {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+        } else {
+            // First launch: show onboarding (model download starts inside onboarding)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
                 self?.openOnboarding()
             }
+        }
+    }
+
+    // MARK: - Auto Download
+
+    private func autoDownloadRecommended() {
+        let recommended = ModelCatalog.recommended
+        Task {
+            try? await modelManager.downloadModel(recommended)
+            appState.selectedModelID = recommended.id
         }
     }
 
@@ -105,7 +116,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         window.styleMask = [.titled, .closable, .fullSizeContentView]
         window.titlebarAppearsTransparent = true
         window.titleVisibility = .hidden
-        window.setContentSize(NSSize(width: 520, height: 480))
+        window.setContentSize(NSSize(width: 480, height: 400))
         window.center()
         window.isReleasedWhenClosed = false
 
