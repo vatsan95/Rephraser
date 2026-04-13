@@ -9,38 +9,26 @@ final class AccessibilityHelper {
 
     private var pollingTimer: Timer?
 
-    /// Once we detect permission is granted (by any method), we cache it.
-    /// This survives the AXIsProcessTrusted() stale-false bug.
+    /// Once we detect permission is granted (by a REAL test), we cache it.
     private var cachedGranted = false
 
     private init() {
-        cachedGranted = AXIsProcessTrusted() || testRealAccessibility()
+        cachedGranted = performRealAccessibilityTest()
     }
 
     /// Check if the app has Accessibility permission.
-    /// Uses cache + real AX test to work around AXIsProcessTrusted() returning stale false.
     var isAccessibilityGranted: Bool {
         if cachedGranted { return true }
-        // Try the API first (fast)
-        if AXIsProcessTrusted() {
-            cachedGranted = true
-            return true
-        }
-        // API might be stale — do a real AX operation to confirm
-        if testRealAccessibility() {
-            cachedGranted = true
-            return true
-        }
-        return false
+        let result = performRealAccessibilityTest()
+        if result { cachedGranted = true }
+        return result
     }
 
     /// Force a fresh check, bypassing the cache
     func recheckPermission() -> Bool {
-        if AXIsProcessTrusted() || testRealAccessibility() {
-            cachedGranted = true
-            return true
-        }
-        return false
+        let result = performRealAccessibilityTest()
+        if result { cachedGranted = true }
+        return result
     }
 
     /// Check permission and optionally prompt the user via system dialog
@@ -62,16 +50,12 @@ final class AccessibilityHelper {
     }
 
     /// Poll for accessibility permission changes, calling the handler when granted.
-    /// Uses a real AX test in addition to AXIsProcessTrusted() to avoid stale results.
     func startPolling(interval: TimeInterval = 1.0, onGranted: @escaping () -> Void) {
         stopPolling()
         pollingTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { [weak self] _ in
             Task { @MainActor in
                 guard let self else { return }
-                // Try both: the API and a real accessibility operation
-                let apiSays = AXIsProcessTrusted()
-                let realTest = self.testRealAccessibility()
-                if apiSays || realTest {
+                if self.performRealAccessibilityTest() {
                     self.cachedGranted = true
                     self.stopPolling()
                     onGranted()
@@ -87,15 +71,66 @@ final class AccessibilityHelper {
 
     // MARK: - Private
 
-    /// Actually try an AX operation to test if we have permission.
-    /// AXIsProcessTrusted() can return false even after the user granted access;
-    /// this gives us ground truth.
-    private func testRealAccessibility() -> Bool {
-        let systemWide = AXUIElementCreateSystemWide()
-        var value: CFTypeRef?
-        let result = AXUIElementCopyAttributeValue(systemWide, kAXFocusedApplicationAttribute as CFString, &value)
-        // If we get .success or .noValue, we have permission.
-        // .cannotComplete and .apiDisabled mean no permission.
-        return result == .success || result == .noValue
+    /// Perform a REAL accessibility test by trying to read from another app.
+    /// Previous approach (system-wide query) gave false positives.
+    /// This tests against Finder (always running) or any other app to confirm
+    /// we truly have cross-app accessibility permission.
+    private func performRealAccessibilityTest() -> Bool {
+        // First check the API
+        if AXIsProcessTrusted() {
+            return true
+        }
+
+        // API might be stale after user toggled permission.
+        // Try a real cross-app AX operation to confirm.
+        // Find a running app that isn't us to test against.
+        let myPID = ProcessInfo.processInfo.processIdentifier
+        let workspace = NSWorkspace.shared
+
+        // Try Finder first (always running)
+        if let finder = workspace.runningApplications.first(where: {
+            $0.bundleIdentifier == "com.apple.finder" && $0.processIdentifier != myPID
+        }) {
+            let appElement = AXUIElementCreateApplication(finder.processIdentifier)
+            var value: CFTypeRef?
+            let result = AXUIElementCopyAttributeValue(appElement, kAXRoleAttribute as CFString, &value)
+            // -25211 = API disabled (no permission), -25200 = failure
+            if result == .success {
+                return true
+            }
+            // If we got apiDisabled, we definitely don't have permission
+            if result.rawValue == -25211 {
+                return false
+            }
+        }
+
+        // Try frontmost app
+        if let frontApp = workspace.frontmostApplication, frontApp.processIdentifier != myPID {
+            let appElement = AXUIElementCreateApplication(frontApp.processIdentifier)
+            var value: CFTypeRef?
+            let result = AXUIElementCopyAttributeValue(appElement, kAXRoleAttribute as CFString, &value)
+            if result == .success {
+                return true
+            }
+        }
+
+        // Try any running app
+        for app in workspace.runningApplications {
+            guard app.processIdentifier != myPID,
+                  app.activationPolicy == .regular else { continue }
+            let appElement = AXUIElementCreateApplication(app.processIdentifier)
+            var value: CFTypeRef?
+            let result = AXUIElementCopyAttributeValue(appElement, kAXRoleAttribute as CFString, &value)
+            if result == .success {
+                return true
+            }
+            // If API disabled, we know for sure
+            if result.rawValue == -25211 {
+                return false
+            }
+            break // only try one
+        }
+
+        return false
     }
 }

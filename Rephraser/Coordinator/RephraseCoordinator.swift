@@ -101,11 +101,14 @@ final class RephraseCoordinator {
 
         // Check preconditions (show panel with error if failed)
         guard AccessibilityHelper.shared.isAccessibilityGranted else {
+            // Trigger the system accessibility prompt dialog
+            AccessibilityHelper.shared.checkAccessibility(prompt: true)
+            // Also open System Settings directly for the user
+            AccessibilityHelper.shared.openAccessibilitySettings()
             // Start polling so we auto-recover when the user grants permission
             AccessibilityHelper.shared.startPolling { [weak self] in
                 self?.currentError = nil
                 self?.resetToIdle()
-                // Dismiss the error panel since permission is now granted
                 RephrasePanel.shared.dismissPanel()
             }
             showErrorWithPanel(.accessibilityNotGranted)
@@ -220,8 +223,11 @@ final class RephraseCoordinator {
     // MARK: - Private Flow Steps
 
     private func performCapture() async {
-        // Simulate Cmd+C while source app is still focused
-        guard let text = await textCapture.captureSelectedText() else {
+        // Pass the source app's PID for direct AX queries
+        let sourceAppPID = sourceTracker.sourceAppPID
+        debugLog("performCapture: sourceApp=\(sourceTracker.sourceAppName ?? "nil"), pid=\(sourceAppPID.map(String.init) ?? "nil")")
+
+        guard let text = await textCapture.captureSelectedText(sourceAppPID: sourceAppPID) else {
             showErrorWithPanel(.emptySelection)
             return
         }

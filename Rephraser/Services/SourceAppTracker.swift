@@ -30,6 +30,11 @@ final class SourceAppTracker {
         sourceApp?.bundleIdentifier
     }
 
+    /// Get the PID of the recorded source app (for direct AX queries)
+    var sourceAppPID: pid_t? {
+        sourceApp?.processIdentifier
+    }
+
     /// Suggest a rephrase mode based on the source app
     func suggestedMode() -> RephraseMode? {
         guard let bundleID = sourceAppBundleID?.lowercased() else { return nil }

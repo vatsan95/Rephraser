@@ -10,21 +10,30 @@ final class TextCaptureService {
     private var savedSnapshot: ClipboardSnapshot?
 
     /// Maximum time to wait for clipboard to change after simulating Cmd+C
-    var maxClipboardWait: Duration = .milliseconds(1000)
+    var maxClipboardWait: Duration = .milliseconds(1500)
 
     /// Capture the currently selected text from the frontmost app.
-    /// Strategy: try AX API first (instant, no side effects), fall back to Cmd+C.
-    func captureSelectedText() async -> String? {
-        debugLog("captureSelectedText called")
+    /// Uses the source app PID for direct AX queries, falls back to AppleScript Cmd+C.
+    func captureSelectedText(sourceAppPID: pid_t? = nil) async -> String? {
+        debugLog("captureSelectedText called, sourceAppPID=\(sourceAppPID.map(String.init) ?? "nil")")
 
-        // Strategy 1: Try reading selected text directly via Accessibility API.
-        if let axText = getSelectedTextViaAX(), !axText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            debugLog("AX capture succeeded: \(axText.prefix(50))...")
+        // Strategy 1: Direct AX API using source app PID (most reliable)
+        if let pid = sourceAppPID {
+            if let axText = getSelectedTextViaAX(pid: pid), !axText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                debugLog("AX (PID) capture succeeded: \(axText.prefix(50))...")
+                return axText
+            }
+        }
+
+        // Strategy 2: AX API via system-wide (legacy fallback)
+        if let axText = getSelectedTextViaSystemWide(), !axText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            debugLog("AX (system-wide) capture succeeded: \(axText.prefix(50))...")
             return axText
         }
+
         debugLog("AX capture returned nil, falling back to clipboard")
 
-        // Strategy 2: Fall back to clipboard simulation (Cmd+C).
+        // Strategy 3: AppleScript-based Cmd+C (most compatible)
         return await captureViaClipboard()
     }
 
@@ -34,9 +43,9 @@ final class TextCaptureService {
         pb.clearContents()
         pb.setString(text, forType: .string)
 
-        try? await Task.sleep(for: .milliseconds(50))
-        CGEventHelpers.simulatePaste()
-        try? await Task.sleep(for: .milliseconds(150))
+        try? await Task.sleep(for: .milliseconds(80))
+        performPasteViaAppleScript()
+        try? await Task.sleep(for: .milliseconds(200))
 
         savedSnapshot?.restore()
         savedSnapshot = nil
@@ -47,26 +56,18 @@ final class TextCaptureService {
         savedSnapshot = nil
     }
 
-    // MARK: - AX-Based Capture
+    // MARK: - AX-Based Capture (PID-targeted)
 
-    private func getSelectedTextViaAX() -> String? {
-        let systemWide = AXUIElementCreateSystemWide()
-
-        // Get the focused application
-        var focusedApp: CFTypeRef?
-        let appResult = AXUIElementCopyAttributeValue(systemWide, kAXFocusedApplicationAttribute as CFString, &focusedApp)
-        guard appResult == .success else {
-            debugLog("AX: can't get focused app (error \(appResult.rawValue))")
-            return nil
-        }
-
-        let appElement = focusedApp as! AXUIElement
+    /// Get selected text directly from the app with the given PID.
+    /// This bypasses the system-wide element which can fail with -25204.
+    private func getSelectedTextViaAX(pid: pid_t) -> String? {
+        let appElement = AXUIElementCreateApplication(pid)
 
         // Get the focused UI element within that app
         var focusedElement: CFTypeRef?
         let elemResult = AXUIElementCopyAttributeValue(appElement, kAXFocusedUIElementAttribute as CFString, &focusedElement)
         guard elemResult == .success else {
-            debugLog("AX: can't get focused element (error \(elemResult.rawValue))")
+            debugLog("AX (PID \(pid)): can't get focused element (error \(elemResult.rawValue))")
             return nil
         }
 
@@ -76,16 +77,51 @@ final class TextCaptureService {
         var selectedText: CFTypeRef?
         let textResult = AXUIElementCopyAttributeValue(element, kAXSelectedTextAttribute as CFString, &selectedText)
         guard textResult == .success else {
-            debugLog("AX: can't get selected text (error \(textResult.rawValue))")
+            debugLog("AX (PID \(pid)): can't get selected text (error \(textResult.rawValue))")
             return nil
         }
 
         let text = selectedText as? String
-        debugLog("AX: got selected text: \(text?.prefix(50) ?? "nil")")
+        debugLog("AX (PID \(pid)): got selected text: \(text?.prefix(50) ?? "nil")")
         return text
     }
 
-    // MARK: - Clipboard-Based Capture
+    // MARK: - AX-Based Capture (System-wide fallback)
+
+    private func getSelectedTextViaSystemWide() -> String? {
+        let systemWide = AXUIElementCreateSystemWide()
+
+        var focusedApp: CFTypeRef?
+        let appResult = AXUIElementCopyAttributeValue(systemWide, kAXFocusedApplicationAttribute as CFString, &focusedApp)
+        guard appResult == .success else {
+            debugLog("AX (system-wide): can't get focused app (error \(appResult.rawValue))")
+            return nil
+        }
+
+        let appElement = focusedApp as! AXUIElement
+
+        var focusedElement: CFTypeRef?
+        let elemResult = AXUIElementCopyAttributeValue(appElement, kAXFocusedUIElementAttribute as CFString, &focusedElement)
+        guard elemResult == .success else {
+            debugLog("AX (system-wide): can't get focused element (error \(elemResult.rawValue))")
+            return nil
+        }
+
+        let element = focusedElement as! AXUIElement
+
+        var selectedText: CFTypeRef?
+        let textResult = AXUIElementCopyAttributeValue(element, kAXSelectedTextAttribute as CFString, &selectedText)
+        guard textResult == .success else {
+            debugLog("AX (system-wide): can't get selected text (error \(textResult.rawValue))")
+            return nil
+        }
+
+        let text = selectedText as? String
+        debugLog("AX (system-wide): got selected text: \(text?.prefix(50) ?? "nil")")
+        return text
+    }
+
+    // MARK: - Clipboard-Based Capture (AppleScript)
 
     private func captureViaClipboard() async -> String? {
         // 1. Wait for the hotkey modifier keys to be released
@@ -99,27 +135,44 @@ final class TextCaptureService {
         debugLog("Clipboard: saved snapshot, changeCount=\(previousChangeCount)")
 
         // 3. Small delay to ensure source app is ready
-        try? await Task.sleep(for: .milliseconds(50))
+        try? await Task.sleep(for: .milliseconds(80))
 
-        // 4. Simulate Cmd+C to copy the selected text
-        debugLog("Clipboard: simulating Cmd+C")
-        CGEventHelpers.simulateCopy()
+        // 4. Simulate Cmd+C via AppleScript (most reliable cross-app method)
+        debugLog("Clipboard: simulating Cmd+C via AppleScript")
+        let appleScriptWorked = performCopyViaAppleScript()
+        debugLog("Clipboard: AppleScript returned \(appleScriptWorked)")
 
-        // 5. Wait for the clipboard to change (adaptive polling)
+        // 5. If AppleScript failed, try CGEvent as last resort
+        if !appleScriptWorked {
+            debugLog("Clipboard: AppleScript failed, trying CGEvent")
+            CGEventHelpers.simulateCopy()
+        }
+
+        // 6. Wait for the clipboard to change (adaptive polling)
         let changed = await waitForClipboardChange(previousChangeCount: previousChangeCount)
         debugLog("Clipboard: changed=\(changed), newChangeCount=\(NSPasteboard.general.changeCount)")
 
-        guard changed else {
+        var clipboardChanged = changed
+
+        if !clipboardChanged && appleScriptWorked {
+            // AppleScript ran but clipboard didn't change — try CGEvent as last resort
+            debugLog("Clipboard: AppleScript didn't change clipboard, trying CGEvent fallback")
+            CGEventHelpers.simulateCopy()
+            clipboardChanged = await waitForClipboardChange(previousChangeCount: previousChangeCount)
+            debugLog("Clipboard: CGEvent fallback changed=\(clipboardChanged)")
+        }
+
+        guard clipboardChanged else {
             savedSnapshot?.restore()
             savedSnapshot = nil
             return nil
         }
 
-        // 6. Read the plain text from clipboard
+        // 7. Read the plain text from clipboard
         let text = NSPasteboard.general.string(forType: .string)
         debugLog("Clipboard: got text: \(text?.prefix(50) ?? "nil")")
 
-        // 7. Immediately restore the original clipboard
+        // 8. Immediately restore the original clipboard
         savedSnapshot?.restore()
 
         guard let captured = text, !captured.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
@@ -129,16 +182,54 @@ final class TextCaptureService {
         return captured
     }
 
+    // MARK: - AppleScript Keystroke Simulation
+
+    /// Use AppleScript to send Cmd+C via System Events.
+    /// This is more reliable than CGEvent because it goes through the
+    /// accessibility framework's own event dispatch.
+    @discardableResult
+    private func performCopyViaAppleScript() -> Bool {
+        let script = NSAppleScript(source: """
+            tell application "System Events"
+                keystroke "c" using command down
+            end tell
+        """)
+        var error: NSDictionary?
+        script?.executeAndReturnError(&error)
+        if let error = error {
+            debugLog("AppleScript copy error: \(error)")
+            return false
+        }
+        return true
+    }
+
+    /// Use AppleScript to send Cmd+V via System Events.
+    private func performPasteViaAppleScript() {
+        let script = NSAppleScript(source: """
+            tell application "System Events"
+                keystroke "v" using command down
+            end tell
+        """)
+        var error: NSDictionary?
+        script?.executeAndReturnError(&error)
+        if let error = error {
+            debugLog("AppleScript paste error: \(error)")
+            // Fall back to CGEvent
+            CGEventHelpers.simulatePaste()
+        }
+    }
+
     // MARK: - Private Helpers
 
     private func waitForModifiersReleased() async {
-        let deadline = ContinuousClock.now + .milliseconds(500)
+        let deadline = ContinuousClock.now + .milliseconds(800)
 
         while ContinuousClock.now < deadline {
             let flags = CGEventSource.flagsState(.hidSystemState)
             let relevant = flags.intersection([.maskAlternate, .maskShift, .maskControl])
             if relevant.isEmpty {
-                try? await Task.sleep(for: .milliseconds(50))
+                // Extra settle time after release
+                try? await Task.sleep(for: .milliseconds(80))
                 return
             }
             try? await Task.sleep(for: .milliseconds(20))
@@ -152,7 +243,7 @@ final class TextCaptureService {
             if NSPasteboard.general.changeCount != previousChangeCount {
                 return true
             }
-            try? await Task.sleep(for: .milliseconds(20))
+            try? await Task.sleep(for: .milliseconds(30))
         }
 
         return false
