@@ -33,6 +33,6 @@
     <key>NSHumanReadableCopyright</key>
     <string>Copyright © 2026 Rephraser. All rights reserved.</string>
     <key>SUFeedURL</key>
-    <string>https://github.com/YOUR_USERNAME/Rephraser/releases/latest/download/appcast.xml</string>
+    <string>https://github.com/vatsan95/Rephraser/releases/latest/download/appcast.xml</string>
 </dict>
 </plist>

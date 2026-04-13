@@ -542,6 +542,7 @@
             <div style="display:flex;justify-content:center;">
                 <div class="showcase-tabs">
                     <button class="showcase-tab active" data-tab="menubar">Menu Bar</button>
+                    <button class="showcase-tab" data-tab="rephrase">In Action</button>
                     <button class="showcase-tab" data-tab="general">General</button>
                     <button class="showcase-tab" data-tab="models">Models</button>
                     <button class="showcase-tab" data-tab="modes">Writing Modes</button>
@@ -553,6 +554,9 @@
             <div class="showcase-frame">
                 <div class="showcase-panel active" id="panel-menubar">
                     <img src="screenshot-menubar.png" alt="Rephraser menu bar dropdown showing writing modes" class="showcase-img" loading="lazy">
+                </div>
+                <div class="showcase-panel" id="panel-rephrase">
+                    <img src="screenshot-rephrase.png" alt="Rephraser in action — rephrasing an email with Accept and Reject buttons" class="showcase-img" loading="lazy">
                 </div>
                 <div class="showcase-panel" id="panel-general">
                     <img src="screenshot-general.png" alt="Rephraser Settings — General tab with keyboard shortcut and behavior options" class="showcase-img" loading="lazy">
@@ -749,6 +753,7 @@
         <p>Enter your email to download. No spam — just release updates if you want them.</p>
         <form class="email-form" id="emailForm" onsubmit="return handleEmailSubmit(event)">
             <input type="email" id="emailInput" placeholder="you@email.com" required autocomplete="email" />
+            <input type="text" name="_honey" id="honeyField" style="display:none!important" tabindex="-1" autocomplete="off" />
             <button type="submit" id="emailBtn">Download</button>
         </form>
         <div class="email-err" id="emailErr"></div>
@@ -812,6 +817,9 @@
         const btn = document.getElementById('emailBtn');
         const email = input.value.trim();
 
+        // Honeypot check — bots fill hidden fields
+        if (document.getElementById('honeyField').value) return false;
+
         // Validate email
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!email || !emailRegex.test(email)) {
@@ -830,7 +838,7 @@
                 method: 'POST',
                 body: JSON.stringify({ email: email })
             }),
-            fetch('https://formsubmit.co/ajax/sudomymail@gmail.com', {
+            fetch('https://formsubmit.co/ajax/7e114eb208eff7d2c682a8007dbb7034d27bc7bc36165d6510fcf1a303c3819b', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                 body: JSON.stringify({ email: email, _subject: 'New Rephraser Download', _template: 'table' })
