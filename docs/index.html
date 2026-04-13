@@ -786,8 +786,16 @@
     });
 
     // Email gate
+    // GoatCounter event helper
+    function trackEvent(name) {
+        if (window.goatcounter && window.goatcounter.count) {
+            window.goatcounter.count({ path: name, title: name, event: true });
+        }
+    }
+
     function openEmailGate(e) {
         e.preventDefault();
+        trackEvent('download-click');
         document.getElementById('emailOverlay').classList.add('show');
         setTimeout(() => document.getElementById('emailInput').focus(), 200);
     }
@@ -829,6 +837,7 @@
             })
         ]).then(([sheetRes]) => {
             // Trigger download regardless — sheet is the source of truth
+            trackEvent('download-started');
             closeEmailGate();
             window.location.href = DOWNLOAD_URL;
             const t = document.getElementById('installToast');
