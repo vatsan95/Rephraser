@@ -820,9 +820,11 @@
         // Honeypot check — bots fill hidden fields
         if (document.getElementById('honeyField').value) return false;
 
-        // Validate email
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!email || !emailRegex.test(email)) {
+        // Validate email — must have valid TLD, no repeated dots, reasonable format
+        const emailRegex = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+        const domain = email.split('@')[1] || '';
+        const blockedDomains = ['test.com','example.com','asdasd.com','temp.com','fake.com','noemail.com'];
+        if (!email || !emailRegex.test(email) || domain.includes('..') || blockedDomains.includes(domain.toLowerCase())) {
             input.classList.add('invalid');
             err.textContent = 'Please enter a valid email address.';
             return false;
