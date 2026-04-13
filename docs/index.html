@@ -404,6 +404,46 @@
 
             footer { padding: 20px 16px; flex-direction: column; gap: 12px; }
         }
+        /* Email gate modal */
+        .email-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+            z-index: 500; display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.2s;
+        }
+        .email-overlay.show { opacity: 1; pointer-events: auto; }
+        .email-modal {
+            background: #1c1c1e; border: 1px solid #2a2a2e; border-radius: 16px;
+            padding: 40px; max-width: 420px; width: calc(100% - 48px); text-align: center;
+        }
+        .email-modal h3 { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+        .email-modal p { font-size: 14px; color: var(--dim); margin-bottom: 24px; line-height: 1.5; }
+        .email-form { display: flex; gap: 8px; }
+        .email-form input {
+            flex: 1; padding: 12px 16px; border-radius: 10px; border: 1px solid #3a3a3e;
+            background: #0a0a0a; color: #fff; font-size: 15px; outline: none;
+            transition: border-color 0.15s;
+        }
+        .email-form input:focus { border-color: var(--accent); }
+        .email-form input.invalid { border-color: #ef4444; }
+        .email-form button {
+            padding: 12px 24px; border-radius: 10px; border: none;
+            background: #fff; color: #0a0a0a; font-size: 15px; font-weight: 700;
+            cursor: pointer; white-space: nowrap; transition: transform 0.1s;
+        }
+        .email-form button:hover { transform: translateY(-1px); }
+        .email-form button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .email-err { color: #ef4444; font-size: 12px; margin-top: 8px; min-height: 18px; }
+        .email-ok { color: #22c55e; font-size: 13px; margin-top: 12px; }
+        .email-close {
+            position: absolute; top: 12px; right: 16px; background: none; border: none;
+            color: var(--dim); font-size: 20px; cursor: pointer; padding: 4px 8px;
+        }
+        .email-modal { position: relative; }
+        .email-privacy { font-size: 11px; color: var(--faint); margin-top: 16px; }
+        @media (max-width: 480px) {
+            .email-form { flex-direction: column; }
+            .email-modal { padding: 28px 20px; }
+        }
     </style>
 </head>
 <body>
@@ -428,7 +468,7 @@
             <a href="#features">Features</a>
             <a href="#compare">vs Apple AI</a>
             <a href="https://github.com/vatsan95/Rephraser">GitHub</a>
-            <a href="https://github.com/user-attachments/files/26660628/Rephraser-macOS.zip" class="nav-btn">Download</a>
+            <a href="#" class="nav-btn" onclick="openEmailGate(event)">Download</a>
         </div>
     </div>
 </nav>
@@ -439,7 +479,7 @@
     <h1>Rewrite anything.<br><span class="d">Without switching apps.</span></h1>
     <p>Select text anywhere on your Mac, press a shortcut, get a better version in seconds. AI runs entirely on your device — no cloud, no API keys, no accounts.</p>
     <div class="hero-cta">
-        <a href="https://github.com/user-attachments/files/26660628/Rephraser-macOS.zip" class="btn">
+        <a href="#" class="btn" onclick="openEmailGate(event)">
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
             Download for Mac
         </a>
@@ -658,7 +698,7 @@
 <section class="bottom-cta fade-in" aria-label="Download">
     <h2>Stop copy-pasting<br><span class="d">into ChatGPT.</span></h2>
     <p>One shortcut. Nine modes. Fully private. Runs on your Mac.</p>
-    <a href="https://github.com/user-attachments/files/26660628/Rephraser-macOS.zip" class="btn">
+    <a href="#" class="btn" onclick="openEmailGate(event)">
         <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
         Download for Mac
     </a>
@@ -698,6 +738,21 @@
     </div>
 </section>
 
+<!-- Email Gate Modal -->
+<div class="email-overlay" id="emailOverlay" onclick="if(event.target===this)closeEmailGate()">
+    <div class="email-modal">
+        <button class="email-close" onclick="closeEmailGate()">&times;</button>
+        <h3>Get Rephraser</h3>
+        <p>Enter your email to download. No spam — just release updates if you want them.</p>
+        <form class="email-form" id="emailForm" onsubmit="return handleEmailSubmit(event)">
+            <input type="email" id="emailInput" placeholder="you@email.com" required autocomplete="email" />
+            <button type="submit" id="emailBtn">Download</button>
+        </form>
+        <div class="email-err" id="emailErr"></div>
+        <div class="email-privacy">We respect your privacy. Unsubscribe anytime.</div>
+    </div>
+</div>
+
 <footer>
     <span>&copy; 2025 Rephraser · macOS</span>
     <div class="f-links">
@@ -707,8 +762,11 @@
     </div>
 </footer>
 
-<!-- Scroll fade-in + download toast -->
+<!-- Scroll fade-in + download toast + email gate -->
 <script>
+    const DOWNLOAD_URL = 'https://github.com/user-attachments/files/26660628/Rephraser-macOS.zip';
+
+    // Scroll fade-in
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
     }, { threshold: 0.1 });
@@ -724,14 +782,67 @@
         });
     });
 
-    document.querySelectorAll('a.btn, a.nav-btn').forEach(a => {
-        if (a.href.includes('Rephraser-macOS.zip')) {
-            a.addEventListener('click', () => {
-                const t = document.getElementById('installToast');
-                t.classList.add('show');
-                setTimeout(() => t.classList.remove('show'), 8000);
-            });
+    // Email gate
+    function openEmailGate(e) {
+        e.preventDefault();
+        document.getElementById('emailOverlay').classList.add('show');
+        setTimeout(() => document.getElementById('emailInput').focus(), 200);
+    }
+    function closeEmailGate() {
+        document.getElementById('emailOverlay').classList.remove('show');
+        document.getElementById('emailErr').textContent = '';
+        document.getElementById('emailInput').classList.remove('invalid');
+    }
+
+    function handleEmailSubmit(e) {
+        e.preventDefault();
+        const input = document.getElementById('emailInput');
+        const err = document.getElementById('emailErr');
+        const btn = document.getElementById('emailBtn');
+        const email = input.value.trim();
+
+        // Validate email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email || !emailRegex.test(email)) {
+            input.classList.add('invalid');
+            err.textContent = 'Please enter a valid email address.';
+            return false;
         }
+        input.classList.remove('invalid');
+        err.textContent = '';
+        btn.disabled = true;
+        btn.textContent = 'Sending...';
+
+        // Submit to Google Sheets (tracking) + FormSubmit (email notification)
+        Promise.all([
+            fetch('https://script.google.com/macros/s/AKfycby9eemA9YDa37xwSiqly0sbb6eoNhMbtYk841syI8qLPl9DGXLHHSqomjTnAGuRew4xFQ/exec', {
+                method: 'POST',
+                body: JSON.stringify({ email: email })
+            }),
+            fetch('https://formsubmit.co/ajax/sudomymail@gmail.com', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify({ email: email, _subject: 'New Rephraser Download', _template: 'table' })
+            })
+        ]).then(([sheetRes]) => {
+            // Trigger download regardless — sheet is the source of truth
+            closeEmailGate();
+            window.location.href = DOWNLOAD_URL;
+            const t = document.getElementById('installToast');
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 8000);
+        }).catch(() => {
+            err.textContent = 'Network error. Please try again.';
+        }).finally(() => {
+            btn.disabled = false;
+            btn.textContent = 'Download';
+        });
+        return false;
+    }
+
+    // Close modal on Escape
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') closeEmailGate();
     });
 </script>
 
