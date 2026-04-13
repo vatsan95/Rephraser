@@ -73,13 +73,41 @@ final class RephraseCoordinator {
 
     // MARK: - Main Flow
 
+    private func debugLog(_ msg: String) {
+        let line = "[\(Date())] [Coordinator] \(msg)\n"
+        let path = "/tmp/rephraser-debug.log"
+        if let data = line.data(using: .utf8) {
+            if FileManager.default.fileExists(atPath: path) {
+                if let handle = FileHandle(forWritingAtPath: path) {
+                    handle.seekToEndOfFile()
+                    handle.write(data)
+                    handle.closeFile()
+                }
+            } else {
+                FileManager.default.createFile(atPath: path, contents: data)
+            }
+        }
+    }
+
     /// Triggered by the global hotkey. Starts the full rephrase flow.
     func triggerRephrase() {
+        debugLog("triggerRephrase called, state=\(state), modelLoaded=\(modelManager.isModelLoaded), accessibility=\(AccessibilityHelper.shared.isAccessibilityGranted)")
+
         // Don't trigger if already in a flow
-        guard state == .idle else { return }
+        guard state == .idle else {
+            debugLog("BLOCKED: state is \(state), not idle")
+            return
+        }
 
         // Check preconditions (show panel with error if failed)
         guard AccessibilityHelper.shared.isAccessibilityGranted else {
+            // Start polling so we auto-recover when the user grants permission
+            AccessibilityHelper.shared.startPolling { [weak self] in
+                self?.currentError = nil
+                self?.resetToIdle()
+                // Dismiss the error panel since permission is now granted
+                RephrasePanel.shared.dismissPanel()
+            }
             showErrorWithPanel(.accessibilityNotGranted)
             return
         }
@@ -158,8 +186,9 @@ final class RephraseCoordinator {
         case .accessibilityNotGranted:
             AccessibilityHelper.shared.openAccessibilitySettings()
         case .noModelLoaded:
-            // Open settings so user can download a model
-            break
+            AppDelegate.shared?.openSettings()
+            resetToIdle()
+            return
         case .inferenceFailed, .streamingFailed, .unknownError:
             // Retry: dismiss error, refocus source app, and re-trigger
             let savedOriginalText = originalText

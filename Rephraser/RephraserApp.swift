@@ -45,13 +45,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Setup the coordinator (registers hotkey)
         coordinator.setup()
 
+        debugLog("Launch: onboarding=\(appState.isOnboardingComplete) model=\(appState.selectedModelID) downloaded=\(modelManager.downloadedModelIDs)")
+
         if appState.isOnboardingComplete {
-            // Returning user: auto-load the previously selected model
             if let model = appState.selectedModel, modelManager.isDownloaded(model) {
-                Task { try? await modelManager.loadModel(model) }
-            } else if !modelManager.isModelLoaded {
-                // Model was deleted or missing — auto-download the recommended one
-                autoDownloadRecommended()
+                debugLog("Loading model: \(model.name)")
+                Task {
+                    do {
+                        try await modelManager.loadModel(model)
+                        debugLog("Model loaded OK")
+                    } catch {
+                        debugLog("Model load FAILED: \(error)")
+                        self.autoDownloadRecommended()
+                    }
+                }
+            } else {
+                debugLog("No downloaded model found, selected=\(String(describing: appState.selectedModel?.name)), isDownloaded=\(appState.selectedModel.map { modelManager.isDownloaded($0) } ?? false)")
+                if !modelManager.isModelLoaded {
+                    autoDownloadRecommended()
+                }
             }
         } else {
             // First launch: show onboarding (model download starts inside onboarding)
@@ -61,13 +73,35 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    // MARK: - Debug
+
+    private func debugLog(_ msg: String) {
+        let line = "[\(Date())] \(msg)\n"
+        let path = "/tmp/rephraser-debug.log"
+        if let data = line.data(using: .utf8) {
+            if FileManager.default.fileExists(atPath: path) {
+                if let handle = FileHandle(forWritingAtPath: path) {
+                    handle.seekToEndOfFile()
+                    handle.write(data)
+                    handle.closeFile()
+                }
+            } else {
+                FileManager.default.createFile(atPath: path, contents: data)
+            }
+        }
+    }
+
     // MARK: - Auto Download
 
     private func autoDownloadRecommended() {
         let recommended = ModelCatalog.recommended
         Task {
-            try? await modelManager.downloadModel(recommended)
-            appState.selectedModelID = recommended.id
+            do {
+                try await modelManager.downloadModel(recommended)
+                appState.selectedModelID = recommended.id
+            } catch {
+                // Download failed — user can retry from Settings
+            }
         }
     }
 

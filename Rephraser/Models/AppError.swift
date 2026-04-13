@@ -57,7 +57,7 @@ enum AppError: LocalizedError, Identifiable {
     var message: String {
         switch self {
         case .accessibilityNotGranted:
-            return "Rephraser needs Accessibility permission to capture and replace text. Click below to open System Settings."
+            return "Rephraser needs Accessibility permission to capture and replace text. Click below to open System Settings. If you already granted it, try quitting and reopening the app."
         case .noModelLoaded:
             return "No AI model is loaded. Open Settings → Model tab → click Download on a model (Gemma 4 E4B recommended)."
         case .emptySelection:

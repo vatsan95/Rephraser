@@ -32,6 +32,15 @@ final class ModelManager {
             downloadedModelIDs = Set(ids)
         }
 
+        // Scan the HF cache to detect models that are on disk but not in our persisted set
+        // (e.g. after a fresh install with a pre-existing cache, or if UserDefaults was cleared)
+        for model in ModelCatalog.all {
+            if !downloadedModelIDs.contains(model.id) && isModelCachedOnDisk(model) {
+                downloadedModelIDs.insert(model.id)
+            }
+        }
+        persistDownloadedIDs()
+
         // Set a small GPU cache limit to keep idle memory low
         MLX.GPU.set(cacheLimit: 20 * 1024 * 1024)
     }
@@ -93,6 +102,7 @@ final class ModelManager {
         }
 
         isLoadingModel = true
+        NSLog("[Rephraser] Loading model: %@ (%@)", model.name, model.huggingFaceID)
 
         do {
             let config = ModelConfiguration(id: model.huggingFaceID)
@@ -109,6 +119,7 @@ final class ModelManager {
             loadedModelID = model.id
             isModelLoaded = true
             isLoadingModel = false
+            NSLog("[Rephraser] Model loaded successfully: %@", model.name)
 
             // Ensure it's in the downloaded set
             if !downloadedModelIDs.contains(model.id) {
@@ -117,6 +128,7 @@ final class ModelManager {
             }
         } catch {
             isLoadingModel = false
+            NSLog("[Rephraser] Model load FAILED: %@", "\(error)")
             throw AppError.inferenceFailed(underlying: "Failed to load model: \(error.localizedDescription)")
         }
     }
@@ -152,5 +164,24 @@ final class ModelManager {
 
     private func persistDownloadedIDs() {
         UserDefaults.standard.set(Array(downloadedModelIDs), forKey: downloadedModelsKey)
+    }
+
+    /// Check if a model's weight files exist in the Hugging Face hub cache.
+    private func isModelCachedOnDisk(_ model: LocalModel) -> Bool {
+        let repoSlug = model.huggingFaceID.replacingOccurrences(of: "/", with: "--")
+        let snapshotsDir = FileManager.default.homeDirectoryForCurrentUser
+            .appendingPathComponent(".cache/huggingface/hub/models--\(repoSlug)/snapshots")
+
+        guard let snapshots = try? FileManager.default.contentsOfDirectory(atPath: snapshotsDir.path),
+              let snapshot = snapshots.first(where: { !$0.hasPrefix(".") }) else {
+            return false
+        }
+
+        // Check that actual model weight files exist (not just config files)
+        let snapshotPath = snapshotsDir.appendingPathComponent(snapshot).path
+        guard let files = try? FileManager.default.contentsOfDirectory(atPath: snapshotPath) else {
+            return false
+        }
+        return files.contains(where: { $0.hasSuffix(".safetensors") })
     }
 }

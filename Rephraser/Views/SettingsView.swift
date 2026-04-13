@@ -202,69 +202,89 @@ private struct ModelRow: View {
     let appState: AppState
     var modelManager: ModelManager
 
+    @State private var errorMessage: String?
+
     private var isActive: Bool { modelManager.loadedModelID == model.id }
     private var isDownloaded: Bool { modelManager.isDownloaded(model) }
 
     var body: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 2) {
-                HStack(spacing: 6) {
-                    Text(model.name)
-                        .fontWeight(.medium)
-                    if model.isRecommended {
-                        Text("Recommended")
-                            .font(.caption2)
-                            .fontWeight(.semibold)
-                            .foregroundStyle(.white)
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 1)
-                            .background(Color.accentColor)
-                            .clipShape(Capsule())
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    HStack(spacing: 6) {
+                        Text(model.name)
+                            .fontWeight(.medium)
+                        if model.isRecommended {
+                            Text("Recommended")
+                                .font(.caption2)
+                                .fontWeight(.semibold)
+                                .foregroundStyle(.white)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 1)
+                                .background(Color.accentColor)
+                                .clipShape(Capsule())
+                        }
                     }
+
+                    Text("\(model.description) -- \(model.sizeDescription)")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
 
-                Text("\(model.description) -- \(model.sizeDescription)")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
+                Spacer()
 
-            Spacer()
+                if isActive {
+                    Text("Active")
+                        .font(.caption)
+                        .foregroundStyle(.green)
+                        .fontWeight(.medium)
+                } else if isDownloaded {
+                    HStack(spacing: 8) {
+                        Button("Load") {
+                            errorMessage = nil
+                            Task {
+                                do {
+                                    try await modelManager.loadModel(model)
+                                    appState.selectedModelID = model.id
+                                } catch {
+                                    errorMessage = error.localizedDescription
+                                }
+                            }
+                        }
+                        .controlSize(.small)
 
-            if isActive {
-                Text("Active")
-                    .font(.caption)
-                    .foregroundStyle(.green)
-                    .fontWeight(.medium)
-            } else if isDownloaded {
-                HStack(spacing: 8) {
-                    Button("Load") {
+                        Button(role: .destructive) {
+                            modelManager.deleteModel(model)
+                        } label: {
+                            Image(systemName: "trash")
+                        }
+                        .controlSize(.small)
+                        .buttonStyle(.borderless)
+                    }
+                } else if modelManager.isDownloading {
+                    Text("...")
+                        .font(.caption)
+                        .foregroundStyle(.tertiary)
+                } else {
+                    Button("Download") {
+                        errorMessage = nil
                         Task {
-                            try? await modelManager.loadModel(model)
-                            appState.selectedModelID = model.id
+                            do {
+                                try await modelManager.downloadModel(model)
+                                appState.selectedModelID = model.id
+                            } catch {
+                                errorMessage = error.localizedDescription
+                            }
                         }
                     }
                     .controlSize(.small)
+                }
+            }
 
-                    Button(role: .destructive) {
-                        modelManager.deleteModel(model)
-                    } label: {
-                        Image(systemName: "trash")
-                    }
-                    .controlSize(.small)
-                    .buttonStyle(.borderless)
-                }
-            } else if modelManager.isDownloading {
-                Text("...")
+            if let errorMessage {
+                Text(errorMessage)
                     .font(.caption)
-                    .foregroundStyle(.tertiary)
-            } else {
-                Button("Download") {
-                    Task {
-                        try? await modelManager.downloadModel(model)
-                        appState.selectedModelID = model.id
-                    }
-                }
-                .controlSize(.small)
+                    .foregroundStyle(.red)
             }
         }
     }
