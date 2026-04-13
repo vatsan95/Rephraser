@@ -312,11 +312,14 @@
         .showcase-thumb {
             border-radius: 10px; overflow: hidden; cursor: pointer;
             border: 1px solid #2a2a2e; transition: transform 0.15s, border-color 0.15s;
+            background: #161618;
         }
         .showcase-thumb:hover { transform: translateY(-2px); border-color: #4a4a4e; }
-        .showcase-thumb img { display: block; width: 100%; height: auto; }
+        .showcase-thumb-img {
+            display: block; width: 100%; height: 140px; object-fit: cover; object-position: top;
+        }
         .showcase-thumb-label {
-            font-size: 11px; color: var(--dim); padding: 6px 0; text-align: center; background: #161618;
+            font-size: 11px; color: var(--dim); padding: 8px 0; text-align: center;
         }
 
         /* ---- Lightbox ---- */
@@ -576,23 +579,23 @@
 
             <div class="showcase-grid">
                 <div class="showcase-thumb" onclick="openLightbox(0)">
-                    <img src="demo.gif" alt="Rephraser in action" loading="lazy">
+                    <img src="demo.gif" alt="Rephraser in action" loading="lazy" class="showcase-thumb-img">
                     <div class="showcase-thumb-label">In Action</div>
                 </div>
                 <div class="showcase-thumb" onclick="openLightbox(1)">
-                    <img src="screenshot-menubar.png" alt="Menu Bar" loading="lazy">
+                    <img src="screenshot-menubar.png" alt="Menu Bar" loading="lazy" class="showcase-thumb-img">
                     <div class="showcase-thumb-label">Menu Bar</div>
                 </div>
                 <div class="showcase-thumb" onclick="openLightbox(2)">
-                    <img src="screenshot-general.png" alt="General Settings" loading="lazy">
+                    <img src="screenshot-general.png" alt="General Settings" loading="lazy" class="showcase-thumb-img">
                     <div class="showcase-thumb-label">General</div>
                 </div>
                 <div class="showcase-thumb" onclick="openLightbox(3)">
-                    <img src="screenshot-models.png" alt="AI Models" loading="lazy">
+                    <img src="screenshot-models.png" alt="AI Models" loading="lazy" class="showcase-thumb-img">
                     <div class="showcase-thumb-label">Models</div>
                 </div>
                 <div class="showcase-thumb" onclick="openLightbox(4)">
-                    <img src="screenshot-modes.png" alt="Writing Modes" loading="lazy">
+                    <img src="screenshot-modes.png" alt="Writing Modes" loading="lazy" class="showcase-thumb-img">
                     <div class="showcase-thumb-label">Modes</div>
                 </div>
             </div>
