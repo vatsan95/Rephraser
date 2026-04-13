@@ -15,7 +15,9 @@ Rephraser is a lightweight macOS menu bar app that lets you select text anywhere
 
 - **On-device AI** — Models run locally via Apple MLX. Your text never leaves your Mac.
 - **System-wide** — Works in any app where you can select text.
-- **Multiple modes** — Professional, Casual, Concise, Elaborate, Fix Grammar, plus custom modes.
+- **9 built-in modes** — Professional, Casual, Concise, Elaborate, Fix Grammar, Confident, Empathetic, Summarize, Key Points — plus custom modes.
+- **Context-aware** — Auto-suggests tone based on source app (e.g., Casual for Slack, Professional for Gmail).
+- **Diff view** — See exactly what changed between your original and the rephrased version.
 - **Streaming** — See the rephrased text appear token-by-token in real time.
 - **Non-destructive** — Your clipboard is preserved. Original text is untouched until you accept.
 - **Lightweight** — Lives in the menu bar. No dock icon, minimal memory when idle.
@@ -26,9 +28,9 @@ Download any of these directly from within the app:
 
 | Model | Size | Notes |
 |-------|------|-------|
-| **Gemma 4 E4B** (recommended) | ~3 GB | Google's latest Gemma 4 — best quality for rephrasing |
-| Gemma 3 4B | ~2.5 GB | Google's Gemma 3 — proven, fast, lightweight |
-| Qwen 3 4B | ~2.5 GB | Strong multilingual support |
+| **Gemma 3 1B** (recommended) | ~0.8 GB | Google's Gemma 3 — fast download, great for quick rephrasing |
+| Gemma 3 4B | ~2.5 GB | Google's Gemma 3 — best quality for rephrasing |
+| Qwen 3 4B | ~2.5 GB | Alibaba — strong multilingual support |
 | Phi-4 Mini | ~2.3 GB | Microsoft — compact and efficient |
 | Llama 3.2 3B | ~1.8 GB | Meta — smallest option, fastest speed |
 
@@ -36,8 +38,8 @@ Download any of these directly from within the app:
 
 - **macOS 14** (Sonoma) or later
 - **Apple Silicon** (M1, M2, M3, M4)
-- ~3 GB disk space for the AI model
-- ~3 GB RAM during inference (fits comfortably on 8 GB Macs)
+- ~0.8 GB disk space for the default AI model (larger models available)
+- ~2-3 GB RAM during inference (fits comfortably on 8 GB Macs)
 
 ## Building from Source
 
