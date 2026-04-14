@@ -214,6 +214,12 @@
             user-select: all; cursor: text;
         }
         .toast-close:hover { color: #e4e4e7; }
+        .toast-divider { height: 1px; background: #27272a; margin: 12px 0; }
+        .toast-donate { font-size: 13px; color: #a1a1aa; }
+        .toast-donate-link {
+            color: #fbbf24; font-weight: 600; text-decoration: none; margin-left: 4px;
+        }
+        .toast-donate-link:hover { text-decoration: underline; }
         .hero-apps {
             margin-top: 40px; display: flex; justify-content: center; gap: 6px; flex-wrap: wrap;
         }
@@ -541,9 +547,13 @@
         <span class="hero-meta">macOS 14+ · Apple Silicon · Free</span>
     </div>
     <div class="install-toast" id="installToast">
+        <button onclick="document.getElementById('installToast').classList.remove('show')" class="toast-close">✕</button>
         <strong>After downloading:</strong> Unzip, drag Rephraser.app to Applications, then run this in Terminal:<br>
         <code class="toast-cmd">xattr -d com.apple.quarantine /Applications/Rephraser.app</code>
-        <button onclick="document.getElementById('installToast').classList.remove('show')" class="toast-close">✕</button>
+        <div class="toast-divider"></div>
+        <div class="toast-donate">
+            Enjoying Rephraser? <a href="https://paypal.me/vatsanIN" target="_blank" rel="noopener" class="toast-donate-link">Buy me a coffee ☕</a>
+        </div>
     </div>
     <div class="hero-apps">
         <span class="ha">Slack</span>
@@ -956,7 +966,6 @@
             window.location.href = DOWNLOAD_URL;
             const t = document.getElementById('installToast');
             t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 8000);
         }).catch(() => {
             err.textContent = 'Network error. Please try again.';
         }).finally(() => {
