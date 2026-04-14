@@ -43,7 +43,7 @@
         "softwareVersion": "1.0.0",
         "processorRequirements": "Apple Silicon (M1 or later)",
         "url": "https://vatsan95.github.io/Rephraser/",
-        "downloadUrl": "https://github.com/vatsan95/Rephraser/releases/download/v1.0.0/Rephraser-macOS.zip",
+        "downloadUrl": "https://github.com/vatsan95/Rephraser/releases/download/v1.0.0/Rephraser-Installer.dmg",
         "featureList": "On-device AI, 9 rephrase modes, context-aware tone, diff view, custom keyboard shortcut, works offline, clipboard preservation, multiple AI models"
     }
     </script>
@@ -548,7 +548,10 @@
     </div>
     <div class="install-toast" id="installToast">
         <button onclick="document.getElementById('installToast').classList.remove('show')" class="toast-close">✕</button>
-        <strong>After downloading:</strong> Unzip, drag Rephraser.app to Applications, then run this in Terminal:<br>
+        <strong>How to install:</strong><br>
+        1. Open the downloaded <strong>Rephraser-Installer.dmg</strong><br>
+        2. Drag <strong>Rephraser</strong> into the <strong>Applications</strong> folder<br>
+        3. If macOS blocks it, run this in Terminal:<br>
         <code class="toast-cmd">xattr -d com.apple.quarantine /Applications/Rephraser.app</code>
         <div class="toast-divider"></div>
         <div class="toast-donate">
@@ -866,7 +869,7 @@
 
 <!-- Scroll fade-in + download toast + email gate -->
 <script>
-    const DOWNLOAD_URL = 'https://github.com/vatsan95/Rephraser/releases/download/v1.0.0/Rephraser-macOS.zip';
+    const DOWNLOAD_URL = 'https://github.com/vatsan95/Rephraser/releases/download/v1.0.0/Rephraser-Installer.dmg';
 
     // Scroll fade-in
     const observer = new IntersectionObserver((entries) => {
