@@ -252,6 +252,7 @@ final class TextCaptureService {
     // MARK: - Debug
 
     private func debugLog(_ msg: String) {
+        #if DEBUG
         let line = "[\(Date())] [TextCapture] \(msg)\n"
         let path = "/tmp/rephraser-debug.log"
         if let data = line.data(using: .utf8) {
@@ -265,5 +266,6 @@ final class TextCaptureService {
                 FileManager.default.createFile(atPath: path, contents: data)
             }
         }
+        #endif
     }
 }

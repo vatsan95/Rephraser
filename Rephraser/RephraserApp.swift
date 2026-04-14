@@ -80,6 +80,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Debug
 
     private func debugLog(_ msg: String) {
+        #if DEBUG
         let line = "[\(Date())] \(msg)\n"
         let path = "/tmp/rephraser-debug.log"
         if let data = line.data(using: .utf8) {
@@ -93,6 +94,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 FileManager.default.createFile(atPath: path, contents: data)
             }
         }
+        #endif
     }
 
     // MARK: - Auto Download

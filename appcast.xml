@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <channel>
+        <title>Rephraser Updates</title>
+        <link>https://vatsan95.github.io/Rephraser/</link>
+        <description>Rephraser app updates</description>
+        <language>en</language>
+        <item>
+            <title>Rephraser 1.0.0</title>
+            <pubDate>Mon, 14 Apr 2026 00:00:00 +0000</pubDate>
+            <sparkle:version>1</sparkle:version>
+            <sparkle:shortVersionString>1.0.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[
+                <h2>Rephraser 1.0.0</h2>
+                <ul>
+                    <li>Initial release</li>
+                    <li>On-device AI text rephrasing powered by Apple MLX</li>
+                    <li>9 writing modes (Professional, Casual, Concise, and more)</li>
+                    <li>Context-aware mode suggestions based on source app</li>
+                    <li>Diff view to see exactly what changed</li>
+                    <li>Works in any app — Slack, Gmail, Notion, VS Code, and more</li>
+                </ul>
+            ]]></description>
+            <enclosure
+                url="https://github.com/vatsan95/Rephraser/releases/download/v1.0.0/Rephraser-macOS.zip"
+                length="12582912"
+                type="application/octet-stream"
+                sparkle:edSignature=""
+            />
+        </item>
+    </channel>
+</rss>

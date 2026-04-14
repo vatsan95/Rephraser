@@ -74,6 +74,7 @@ final class RephraseCoordinator {
     // MARK: - Main Flow
 
     private func debugLog(_ msg: String) {
+        #if DEBUG
         let line = "[\(Date())] [Coordinator] \(msg)\n"
         let path = "/tmp/rephraser-debug.log"
         if let data = line.data(using: .utf8) {
@@ -87,6 +88,7 @@ final class RephraseCoordinator {
                 FileManager.default.createFile(atPath: path, contents: data)
             }
         }
+        #endif
     }
 
     /// Triggered by the global hotkey. Starts the full rephrase flow.

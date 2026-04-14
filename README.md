@@ -99,6 +99,7 @@ Rephraser/
 - **MLX Swift** — Apple's ML framework for on-device inference
 - **HotKey** — Global keyboard shortcut registration
 - **Sparkle** — Auto-update framework
+- **TelemetryDeck** — Privacy-first anonymous analytics (opt-out available)
 
 ## Privacy
 
@@ -106,7 +107,8 @@ Rephraser is designed to be private by default:
 
 - AI inference happens **entirely on your device**
 - **No text is sent to any server** — ever
-- No accounts, no telemetry, no analytics
+- No accounts, no API keys, no subscription
+- Optional anonymous usage analytics via [TelemetryDeck](https://telemetrydeck.com) (no text content is ever collected — just anonymous event counts like "rephrase started"). You can opt out in Settings → Analytics.
 - Your clipboard is restored after every operation
 
 ## License
