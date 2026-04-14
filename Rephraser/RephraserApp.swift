@@ -42,6 +42,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         AppDelegate.shared = self
 
+        // Initialize analytics
+        Analytics.initialize()
+        Analytics.trackAppLaunch()
+
         // Setup the coordinator (registers hotkey)
         coordinator.setup()
 

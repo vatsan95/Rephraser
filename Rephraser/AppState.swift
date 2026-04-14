@@ -77,6 +77,12 @@ final class AppState {
         return combo.description
     }
 
+    // MARK: - Analytics
+
+    var analyticsEnabled: Bool {
+        didSet { UserDefaults.standard.set(analyticsEnabled, forKey: "analyticsEnabled") }
+    }
+
     // MARK: - Onboarding
 
     var isOnboardingComplete: Bool {
@@ -137,6 +143,7 @@ final class AppState {
         // Load behavior
         self.soundEnabled = defaults.bool(forKey: "soundEnabled")
         self.launchAtLogin = defaults.bool(forKey: "launchAtLogin")
+        self.analyticsEnabled = defaults.object(forKey: "analyticsEnabled") == nil ? true : defaults.bool(forKey: "analyticsEnabled")
         self.isOnboardingComplete = defaults.bool(forKey: "isOnboardingComplete")
     }
 }

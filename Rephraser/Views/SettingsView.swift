@@ -114,6 +114,13 @@ private struct GeneralTab: View {
                 Toggle("Launch at login", isOn: $appState.launchAtLogin)
             }
 
+            Section("Analytics") {
+                Toggle("Send anonymous usage stats", isOn: $appState.analyticsEnabled)
+                Text("No text content is ever sent. Just anonymous event counts to help improve the app.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
             Section("Updates") {
                 HStack {
                     Text("Rephraser v1.0.0")

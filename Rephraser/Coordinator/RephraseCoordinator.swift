@@ -137,6 +137,9 @@ final class RephraseCoordinator {
             activeMode = appState.defaultMode
         }
 
+        // Track rephrase started
+        Analytics.trackRephraseStarted(mode: activeMode.displayName)
+
         // Start the capture flow. Panel is NOT shown yet --
         // Cmd+C must fire while the source app still has focus.
         state = .capturing
@@ -149,6 +152,7 @@ final class RephraseCoordinator {
     /// Accept the rephrased result and paste it back
     func acceptResult() {
         guard state == .showingResult, !streamingText.isEmpty else { return }
+        Analytics.trackRephraseAccepted(mode: activeMode.displayName)
         state = .pasting
 
         currentTask = Task {
@@ -158,6 +162,7 @@ final class RephraseCoordinator {
 
     /// Reject the result -- dismiss and go back to idle
     func rejectResult() {
+        Analytics.trackRephraseRejected()
         cancelCurrentTask()
         textCapture.cleanup()
         sourceTracker.clear()
@@ -168,6 +173,7 @@ final class RephraseCoordinator {
     func changeMode(_ mode: RephraseMode) {
         guard state == .showingResult || state == .rephrasing else { return }
 
+        Analytics.trackModeChanged(mode: mode.displayName)
         activeMode = mode
         cancelCurrentTask()
 

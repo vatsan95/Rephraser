@@ -13,6 +13,7 @@ let package = Package(
         .package(url: "https://github.com/soffes/HotKey", from: "0.2.0"),
         .package(url: "https://github.com/ml-explore/mlx-swift-lm", from: "2.21.0"),
         .package(url: "https://github.com/sparkle-project/Sparkle", from: "2.6.0"),
+        .package(url: "https://github.com/TelemetryDeck/SwiftSDK", from: "2.0.0"),
     ],
     targets: [
         .executableTarget(
@@ -22,6 +23,7 @@ let package = Package(
                 .product(name: "MLXLLM", package: "mlx-swift-lm"),
                 .product(name: "MLXLMCommon", package: "mlx-swift-lm"),
                 .product(name: "Sparkle", package: "Sparkle"),
+                .product(name: "TelemetryDeck", package: "SwiftSDK"),
             ],
             path: "Rephraser",
             exclude: ["Info.plist", "Rephraser.entitlements", "Assets.xcassets"],

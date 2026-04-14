@@ -78,6 +78,9 @@ final class ModelManager {
             downloadedModelIDs.insert(model.id)
             persistDownloadedIDs()
 
+            // Track download
+            Analytics.trackModelDownloaded(modelName: model.name)
+
             // Also set it as the loaded model
             modelContainer = container
             loadedModelID = model.id
