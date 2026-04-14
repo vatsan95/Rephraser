@@ -963,7 +963,7 @@
             // Trigger download regardless — sheet is the source of truth
             trackEvent('download-started');
             closeEmailGate();
-            window.location.href = DOWNLOAD_URL;
+            window.open(DOWNLOAD_URL, '_blank');
             const t = document.getElementById('installToast');
             t.classList.add('show');
         }).catch(() => {
