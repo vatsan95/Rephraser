@@ -1,0 +1,108 @@
+name: Windows PoC (Phase 0 gate)
+
+# Purpose: de-risk the Tauri+llama-cpp-2 stack BEFORE we commit to it.
+# Builds and runs the Rephraser Windows PoC on a windows-latest runner,
+# downloading Gemma 3 1B Q4_K_M GGUF from HuggingFace and asserting that
+# inference works at acceptable speed. If this fails, switch to
+# `mistral.rs` or `candle` before Phase 1 (see windows/DECISIONS.md).
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'windows/poc/**'
+      - '.github/workflows/windows-poc.yml'
+  pull_request:
+    paths:
+      - 'windows/poc/**'
+      - '.github/workflows/windows-poc.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-run:
+    name: Build + run PoC on windows-latest
+    runs-on: windows-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust (stable)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: windows/poc
+
+      - name: Install CMake (required by llama-cpp-2 native build)
+        uses: lukka/get-cmake@latest
+
+      - name: Show toolchain
+        shell: pwsh
+        working-directory: windows/poc
+        run: |
+          rustc --version
+          cargo --version
+          cmake --version
+          cl.exe 2>&1 | Select-Object -First 1
+
+      - name: Lint (fmt + clippy)
+        shell: pwsh
+        working-directory: windows/poc
+        run: |
+          cargo fmt --check
+          cargo clippy --release --locked -- -D warnings
+
+      - name: Build (release)
+        shell: pwsh
+        working-directory: windows/poc
+        run: cargo build --release --locked
+
+      - name: Report binary size
+        shell: pwsh
+        working-directory: windows/poc
+        run: |
+          $bin = "target/release/rephraser-poc.exe"
+          if (!(Test-Path $bin)) { throw "Binary not found at $bin" }
+          $sizeMB = [math]::Round((Get-Item $bin).Length / 1MB, 2)
+          Write-Host "Binary size: $sizeMB MB"
+          # Gate: <80 MB
+          if ($sizeMB -gt 80) {
+            throw "GATE FAILED: binary size $sizeMB MB exceeds 80 MB budget"
+          }
+
+      - name: Run PoC (downloads Gemma 3 1B + streams output)
+        shell: pwsh
+        working-directory: windows/poc
+        env:
+          RUST_LOG: info
+          # HuggingFace anonymous rate limit is usually fine; set token if added.
+          HF_HUB_ENABLE_HF_TRANSFER: "0"
+        run: |
+          ./target/release/rephraser-poc.exe `
+            --repo "bartowski/gemma-3-1b-it-GGUF" `
+            --filename "gemma-3-1b-it-Q4_K_M.gguf" `
+            --prompt "hey can u send me the deck asap thx" `
+            --max-tokens 64
+
+      - name: Upload PoC binary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rephraser-poc-windows-x64
+          path: windows/poc/target/release/rephraser-poc.exe
+          retention-days: 14
+
+      - name: Summary
+        if: success()
+        shell: pwsh
+        run: |
+          Write-Host "✅ Phase 0 gate PASSED — llama-cpp-2 works on Windows with Gemma 3 1B."
+          Write-Host "   Proceed to Phase 1 (Tauri skeleton)."

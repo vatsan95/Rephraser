@@ -1,0 +1,30 @@
+[package]
+name = "rephraser-poc"
+version = "0.1.0"
+edition = "2021"
+description = "Phase 0 de-risk: verify llama-cpp-2 + Gemma 3 1B GGUF works on Windows"
+license = "MIT"
+
+[dependencies]
+# Inference backend under evaluation
+llama-cpp-2 = "0.1.54"
+
+# Model download from HuggingFace
+hf-hub = { version = "0.3", default-features = false, features = ["tokio", "rustls-tls"] }
+
+# Core
+anyhow = "1"
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "fs", "io-util"] }
+
+# Observability
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# CLI args
+clap = { version = "4", features = ["derive"] }
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+strip = true
