@@ -1,0 +1,107 @@
+name: Windows Build (Phase 1 Tauri skeleton)
+
+# Phase 1+ CI: build + lint + package MSI/NSIS on windows-latest.
+# Later phases add signing, VirusTotal scan, release publishing.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'windows/app/**'
+      - '.github/workflows/windows-build.yml'
+  pull_request:
+    paths:
+      - 'windows/app/**'
+      - '.github/workflows/windows-build.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build Rephraser on windows-latest
+    runs-on: windows-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust (stable)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+
+      - name: Cache cargo (tauri app)
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: windows/app/src-tauri
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: windows/app/pnpm-lock.yaml
+
+      - name: Install frontend deps
+        shell: pwsh
+        working-directory: windows/app
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Rust fmt + clippy
+        shell: pwsh
+        working-directory: windows/app/src-tauri
+        run: |
+          cargo fmt --check
+          cargo clippy --release -- -D warnings
+
+      - name: Build Tauri app (MSI + NSIS)
+        shell: pwsh
+        working-directory: windows/app
+        env:
+          # Updater signing disabled for Phase 1 skeleton; real key lands in Phase 6.
+          TAURI_SIGNING_PRIVATE_KEY: ""
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ""
+        run: pnpm tauri build
+
+      - name: Report bundle sizes
+        shell: pwsh
+        working-directory: windows/app
+        run: |
+          $msi = Get-ChildItem -Path "src-tauri/target/release/bundle/msi" -Filter "*.msi" -ErrorAction SilentlyContinue | Select-Object -First 1
+          $nsis = Get-ChildItem -Path "src-tauri/target/release/bundle/nsis" -Filter "*.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
+          if ($msi) {
+            $msiMB = [math]::Round($msi.Length / 1MB, 2)
+            Write-Host "MSI: $($msi.Name) = $msiMB MB"
+            if ($msiMB -gt 25) { throw "GATE FAILED: MSI $msiMB MB exceeds 25 MB budget" }
+          } else { Write-Host "No MSI produced" }
+          if ($nsis) {
+            $nsisMB = [math]::Round($nsis.Length / 1MB, 2)
+            Write-Host "NSIS: $($nsis.Name) = $nsisMB MB"
+            if ($nsisMB -gt 25) { throw "GATE FAILED: NSIS $nsisMB MB exceeds 25 MB budget" }
+          } else { Write-Host "No NSIS installer produced" }
+
+      - name: Upload MSI
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rephraser-windows-msi
+          path: windows/app/src-tauri/target/release/bundle/msi/*.msi
+          retention-days: 14
+          if-no-files-found: warn
+
+      - name: Upload NSIS installer
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rephraser-windows-nsis
+          path: windows/app/src-tauri/target/release/bundle/nsis/*.exe
+          retention-days: 14
+          if-no-files-found: warn
