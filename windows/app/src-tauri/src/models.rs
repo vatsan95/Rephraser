@@ -180,7 +180,7 @@ pub async fn download(app: AppHandle, id: String) -> Result<PathBuf> {
         return Ok(target);
     }
 
-    let min_bytes = (entry.approx_size_mb as u64) * 1024 * 1024 * 2;
+    let min_bytes = entry.approx_size_mb * 1024 * 1024 * 2;
     precheck_disk(&target, min_bytes)?;
 
     let url = hf_resolve_url(&entry.repo, &entry.filename);
@@ -253,6 +253,7 @@ pub fn delete(app: &AppHandle, id: &str) -> Result<()> {
 }
 
 /// Convenience: look up the local path for an installed model (or None).
+#[allow(dead_code)] // wired up in Phase 6 (settings → auto-load selected model)
 pub fn installed_path(app: &AppHandle, id: &str) -> Option<PathBuf> {
     let entry = catalog().models.iter().find(|e| e.id == id)?;
     let p = path_for(app, entry).ok()?;
