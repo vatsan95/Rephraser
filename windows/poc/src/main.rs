@@ -1,13 +1,15 @@
 //! Rephraser Windows PoC — Phase 0 de-risk gate.
 //!
 //! Downloads Gemma 3 1B Q4_K_M GGUF, loads it via `llama-cpp-2`, streams a
-//! rephrase prompt to stdout, and reports tokens/sec + peak RAM. CI asserts
-//! the Go/No-Go gates from the plan:
-//!   - Model loads in < 1.5 GB
+//! rephrase prompt to stdout, and reports tokens/sec. CI asserts the Go/No-Go
+//! gates from the plan:
+//!   - Model loads (<1.5 GB RAM target — measured in Phase 3)
 //!   - CPU streaming >= 3 tok/s on GitHub windows-latest runner
 //!   - Non-empty output for a known prompt
 //!
 //! If this fails, switch stack to `mistral.rs` or `candle` before Phase 1.
+
+#![allow(deprecated)] // some llama-cpp-2 methods are deprecated in 0.1.143 but still work
 
 use anyhow::{Context, Result};
 use clap::Parser;
@@ -17,7 +19,7 @@ use llama_cpp_2::{
     llama_backend::LlamaBackend,
     llama_batch::LlamaBatch,
     model::{params::LlamaModelParams, AddBos, LlamaModel, Special},
-    token::data_array::LlamaTokenDataArray,
+    sampling::LlamaSampler,
 };
 use std::{num::NonZeroU32, path::PathBuf, time::Instant};
 use tracing::{info, warn};
@@ -122,7 +124,9 @@ async fn main() -> Result<()> {
     }
     ctx.decode(&mut batch).context("Prefill decode failed")?;
 
-    // -------- Step 6: Generate + stream --------
+    // -------- Step 6: Generate + stream (greedy sampler for determinism) --------
+    let mut sampler = LlamaSampler::chain_simple([LlamaSampler::greedy()]);
+
     let mut n_cur = batch.n_tokens();
     let mut n_decode = 0;
     let t_gen_start = Instant::now();
@@ -131,10 +135,8 @@ async fn main() -> Result<()> {
     let mut full_output = String::new();
 
     while n_decode < args.max_tokens {
-        // Sample next token (greedy for determinism in CI).
-        let candidates = ctx.candidates_ith(batch.n_tokens() - 1);
-        let mut candidates_p = LlamaTokenDataArray::from_iter(candidates, false);
-        let new_token = ctx.sample_token_greedy(&mut candidates_p);
+        let new_token = sampler.sample(&ctx, batch.n_tokens() - 1);
+        sampler.accept(new_token);
 
         // EOS?
         if model.is_eog_token(new_token) {
@@ -144,7 +146,7 @@ async fn main() -> Result<()> {
 
         let piece = model
             .token_to_str(new_token, Special::Tokenize)
-            .unwrap_or_else(|_| String::from(""));
+            .unwrap_or_default();
         print!("{piece}");
         use std::io::Write;
         std::io::stdout().flush().ok();
@@ -179,9 +181,6 @@ async fn main() -> Result<()> {
             tok_per_sec
         ));
     }
-    // Model size sanity check: Gemma 3 1B Q4_K_M should be ~0.8 GB on disk
-    // and use <1.5 GB RAM. We can't easily measure RAM here without OS
-    // bindings — defer that assertion to Phase 3 benchmarks.
 
     if !failures.is_empty() {
         for f in &failures {
