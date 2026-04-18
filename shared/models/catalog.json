@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "source": "Ported from Rephraser Mac model catalog; GGUF equivalents for Windows (llama.cpp).",
+  "defaultModelId": "qwen2.5-0.5b",
+  "models": [
+    {
+      "id": "qwen2.5-0.5b",
+      "displayName": "Qwen 2.5 0.5B (fastest)",
+      "description": "Tiny 0.5B model — instant responses, good for short rephrases on any laptop.",
+      "repo": "bartowski/Qwen2.5-0.5B-Instruct-GGUF",
+      "filename": "Qwen2.5-0.5B-Instruct-Q4_K_M.gguf",
+      "approxSizeMB": 400,
+      "minRamGB": 2,
+      "promptFormat": "chatml",
+      "gated": false
+    },
+    {
+      "id": "qwen3-4b",
+      "displayName": "Qwen 3 4B",
+      "description": "Strong multilingual rephraser. Recommended if you have 8GB+ RAM.",
+      "repo": "bartowski/Qwen3-4B-GGUF",
+      "filename": "Qwen3-4B-Q4_K_M.gguf",
+      "approxSizeMB": 2500,
+      "minRamGB": 6,
+      "promptFormat": "chatml",
+      "gated": false
+    },
+    {
+      "id": "phi-4-mini",
+      "displayName": "Phi-4 Mini",
+      "description": "Microsoft Phi-4 Mini — balanced quality and size.",
+      "repo": "bartowski/Phi-4-mini-instruct-GGUF",
+      "filename": "Phi-4-mini-instruct-Q4_K_M.gguf",
+      "approxSizeMB": 2300,
+      "minRamGB": 6,
+      "promptFormat": "chatml",
+      "gated": false
+    },
+    {
+      "id": "llama-3.2-3b",
+      "displayName": "Llama 3.2 3B",
+      "description": "Meta Llama 3.2 3B — high-quality English rephrasing.",
+      "repo": "bartowski/Llama-3.2-3B-Instruct-GGUF",
+      "filename": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+      "approxSizeMB": 1800,
+      "minRamGB": 5,
+      "promptFormat": "llama3",
+      "gated": false
+    },
+    {
+      "id": "gemma-3-1b",
+      "displayName": "Gemma 3 1B (recommended, gated)",
+      "description": "Google Gemma 3 1B — small and capable. Requires HuggingFace license acceptance.",
+      "repo": "bartowski/gemma-3-1b-it-GGUF",
+      "filename": "gemma-3-1b-it-Q4_K_M.gguf",
+      "approxSizeMB": 800,
+      "minRamGB": 3,
+      "promptFormat": "gemma",
+      "gated": true
+    },
+    {
+      "id": "gemma-3-4b",
+      "displayName": "Gemma 3 4B (gated)",
+      "description": "Google Gemma 3 4B — better quality. Requires HuggingFace license acceptance.",
+      "repo": "bartowski/gemma-3-4b-it-GGUF",
+      "filename": "gemma-3-4b-it-Q4_K_M.gguf",
+      "approxSizeMB": 2500,
+      "minRamGB": 6,
+      "promptFormat": "gemma",
+      "gated": true
+    }
+  ]
+}

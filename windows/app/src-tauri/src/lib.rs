@@ -5,6 +5,7 @@ mod clipboard;
 mod context;
 mod hotkey;
 mod inference;
+mod models;
 mod panel;
 
 use tauri::{
@@ -55,6 +56,31 @@ async fn rephrase(app: tauri::AppHandle, text: String, mode: String) -> Result<(
     inference::rephrase(app, text, mode)
         .await
         .map_err(|e| e.to_string())
+}
+
+/// Phase 5: return the compiled-in model catalog.
+#[tauri::command]
+fn list_catalog() -> &'static models::Catalog {
+    models::catalog()
+}
+
+/// Phase 5: list installed models in %LOCALAPPDATA%\\Rephraser\\models\\.
+#[tauri::command]
+async fn list_installed_models(app: tauri::AppHandle) -> Result<Vec<models::InstalledModel>, String> {
+    models::list_installed(&app).map_err(|e| e.to_string())
+}
+
+/// Phase 5: download a GGUF by catalog id. Emits `download://progress`.
+#[tauri::command]
+async fn download_model(app: tauri::AppHandle, id: String) -> Result<String, String> {
+    let path = models::download(app, id).await.map_err(|e| e.to_string())?;
+    Ok(path.to_string_lossy().into_owned())
+}
+
+/// Phase 5: delete an installed model.
+#[tauri::command]
+async fn delete_model(app: tauri::AppHandle, id: String) -> Result<(), String> {
+    models::delete(&app, &id).map_err(|e| e.to_string())
 }
 
 /// Phase 4: user hit Enter — paste the rephrased text at caret, then
@@ -160,7 +186,11 @@ pub fn run() {
             is_model_loaded,
             rephrase,
             panel_accept,
-            panel_dismiss
+            panel_dismiss,
+            list_catalog,
+            list_installed_models,
+            download_model,
+            delete_model
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
