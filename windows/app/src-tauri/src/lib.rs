@@ -1,5 +1,8 @@
-//! Rephraser for Windows — Phase 1 skeleton.
-//! Tray-only headless app. Future phases add hotkey, inference, panel.
+//! Rephraser for Windows — Phase 1 skeleton + Phase 2 hotkey/clipboard.
+
+mod clipboard;
+mod context;
+mod hotkey;
 
 use tauri::{
     menu::{Menu, MenuItem},
@@ -12,11 +15,28 @@ fn ping() -> &'static str {
     "pong"
 }
 
+/// Command invoked from the hotkey event bridge (or frontend for testing).
+/// Snapshots clipboard, synthesizes Ctrl+C, returns the captured selection.
+/// Phase 3 will chain this into inference.
+#[tauri::command]
+async fn capture_selection() -> Result<serde_json::Value, String> {
+    let previous = clipboard::snapshot();
+    let captured = clipboard::capture_selection(previous.as_deref()).map_err(|e| e.to_string())?;
+    let process = context::foreground_process_name().unwrap_or_default();
+    let mode = context::mode_for_process(&process);
+
+    Ok(serde_json::json!({
+        "text": captured,
+        "previous_clipboard": previous,
+        "source_process": process,
+        "suggested_mode": mode,
+    }))
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_single_instance::init(|app, _argv, _cwd| {
-            // Focus existing instance's main window if we ever open one.
             if let Some(window) = app.get_webview_window("main") {
                 let _ = window.unminimize();
                 let _ = window.set_focus();
@@ -32,7 +52,7 @@ pub fn run() {
             None,
         ))
         .setup(|app| {
-            // System tray with minimal menu (Phase 1 skeleton).
+            // System tray (Phase 1)
             let quit_item = MenuItem::with_id(app, "quit", "Quit Rephraser", true, None::<&str>)?;
             let about_item =
                 MenuItem::with_id(app, "about", "About Rephraser", true, None::<&str>)?;
@@ -47,16 +67,20 @@ pub fn run() {
                         app.exit(0);
                     }
                     "about" => {
-                        // TODO(phase 4): open about/settings panel
                         tracing::info!("About clicked (panel not yet implemented)");
                     }
                     _ => {}
                 })
                 .build(app)?;
 
+            // Global hotkey (Phase 2)
+            if let Err(e) = hotkey::init(&app.handle().clone()) {
+                tracing::warn!("Failed to init hotkey: {e}");
+            }
+
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![ping])
+        .invoke_handler(tauri::generate_handler![ping, capture_selection])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
