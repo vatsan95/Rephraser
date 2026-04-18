@@ -10,7 +10,7 @@ license = "MIT"
 llama-cpp-2 = "0.1.54"
 
 # Model download from HuggingFace
-hf-hub = { version = "0.3", default-features = false, features = ["tokio", "rustls-tls"] }
+hf-hub = { version = "0.3", default-features = false, features = ["tokio"] }
 
 # Core
 anyhow = "1"

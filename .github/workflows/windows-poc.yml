@@ -66,8 +66,7 @@ jobs:
       - name: Build (release)
         shell: pwsh
         working-directory: windows/poc
-        run: cargo build --release --locked
-
+        run: cargo build --release 
       - name: Report binary size
         shell: pwsh
         working-directory: windows/poc

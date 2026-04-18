@@ -76,7 +76,10 @@ async fn main() -> Result<()> {
     };
 
     let model_size = std::fs::metadata(&model_path)?.len();
-    info!("Model file size: {:.2} MB", model_size as f64 / 1024.0 / 1024.0);
+    info!(
+        "Model file size: {:.2} MB",
+        model_size as f64 / 1024.0 / 1024.0
+    );
 
     // -------- Step 2: Init backend + load model --------
     let t0 = Instant::now();
@@ -171,7 +174,10 @@ async fn main() -> Result<()> {
         failures.push("Empty output".to_string());
     }
     if tok_per_sec < 3.0 {
-        failures.push(format!("tok/s {:.2} < 3.0 (minimum for CPU inference)", tok_per_sec));
+        failures.push(format!(
+            "tok/s {:.2} < 3.0 (minimum for CPU inference)",
+            tok_per_sec
+        ));
     }
     // Model size sanity check: Gemma 3 1B Q4_K_M should be ~0.8 GB on disk
     // and use <1.5 GB RAM. We can't easily measure RAM here without OS
