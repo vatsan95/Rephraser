@@ -1,12 +1,14 @@
 //! Rephraser for Windows — Phase 1 skeleton + Phase 2 hotkey/clipboard
 //! + Phase 3 inference + Phase 4 floating panel.
 
+mod analytics;
 mod clipboard;
 mod context;
 mod hotkey;
 mod inference;
 mod models;
 mod panel;
+mod settings;
 
 use tauri::{
     menu::{Menu, MenuItem},
@@ -53,9 +55,32 @@ async fn is_model_loaded() -> bool {
 /// Phase 3: stream a rephrase — emits `rephrase://token` + `rephrase://done`.
 #[tauri::command]
 async fn rephrase(app: tauri::AppHandle, text: String, mode: String) -> Result<(), String> {
+    analytics::emit(
+        &app,
+        "rephraseStarted",
+        serde_json::json!({ "mode": mode }),
+    );
     inference::rephrase(app, text, mode)
         .await
         .map_err(|e| e.to_string())
+}
+
+/// Phase 6: read the persisted settings (defaults if missing).
+#[tauri::command]
+fn get_settings(app: tauri::AppHandle) -> settings::Settings {
+    settings::load(&app)
+}
+
+/// Phase 6: write the full settings struct to disk (atomic).
+#[tauri::command]
+fn update_settings(app: tauri::AppHandle, settings: settings::Settings) -> Result<(), String> {
+    settings::save(&app, &settings).map_err(|e| e.to_string())
+}
+
+/// Phase 6: frontend-fired analytics event (e.g. modeChanged from dropdown).
+#[tauri::command]
+fn analytics_emit(app: tauri::AppHandle, event: String, payload: serde_json::Value) {
+    analytics::emit(&app, &event, payload);
 }
 
 /// Phase 5: return the compiled-in model catalog.
@@ -73,7 +98,14 @@ async fn list_installed_models(app: tauri::AppHandle) -> Result<Vec<models::Inst
 /// Phase 5: download a GGUF by catalog id. Emits `download://progress`.
 #[tauri::command]
 async fn download_model(app: tauri::AppHandle, id: String) -> Result<String, String> {
-    let path = models::download(app, id).await.map_err(|e| e.to_string())?;
+    let path = models::download(app.clone(), id.clone())
+        .await
+        .map_err(|e| e.to_string())?;
+    analytics::emit(
+        &app,
+        "modelDownloaded",
+        serde_json::json!({ "modelID": id }),
+    );
     Ok(path.to_string_lossy().into_owned())
 }
 
@@ -93,6 +125,7 @@ async fn panel_accept(
 ) -> Result<(), String> {
     clipboard::restore(&final_text).map_err(|e| e.to_string())?;
     clipboard::synth_paste().map_err(|e| e.to_string())?;
+    analytics::emit(&app, "rephraseAccepted", serde_json::json!({}));
 
     // Give the target app a moment to consume Ctrl+V before we overwrite.
     let prev = previous_clipboard.clone();
@@ -116,6 +149,7 @@ async fn panel_dismiss(
     if let Some(p) = previous_clipboard {
         let _ = clipboard::restore(&p);
     }
+    analytics::emit(&app, "rephraseRejected", serde_json::json!({}));
     panel::close_panel(&app);
     Ok(())
 }
@@ -166,6 +200,22 @@ pub fn run() {
                 tracing::warn!("Failed to init hotkey: {e}");
             }
 
+            // Phase 6: analytics — appLaunched.
+            analytics::emit(&app_handle, "appLaunched", serde_json::json!({}));
+
+            // Phase 6: auto-load the currently selected model if it's installed.
+            let app_for_autoload = app.handle().clone();
+            tauri::async_runtime::spawn(async move {
+                let settings = settings::load(&app_for_autoload);
+                if let Some(id) = settings.selected_model_id.as_ref() {
+                    if let Some(path) = models::installed_path(&app_for_autoload, id) {
+                        if let Err(e) = inference::load_model(path).await {
+                            tracing::warn!("auto-load model failed: {e}");
+                        }
+                    }
+                }
+            });
+
             // Phase 4: listen for hotkey events on the main thread and
             // drive the capture → panel flow here, not in the hotkey
             // listener thread (keeps that thread as a pure event pump).
@@ -190,7 +240,10 @@ pub fn run() {
             list_catalog,
             list_installed_models,
             download_model,
-            delete_model
+            delete_model,
+            get_settings,
+            update_settings,
+            analytics_emit
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
