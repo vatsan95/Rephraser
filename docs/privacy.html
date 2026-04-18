@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rephraser — Privacy Policy</title>
+    <meta name="description" content="Rephraser privacy policy. What we collect, what we don't, and why.">
+    <meta name="theme-color" content="#0a0a0a">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://vatsan95.github.io/Rephraser/privacy.html">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <style>
+        :root { --bg:#0a0a0a; --fg:#f5f5f5; --dim:#b8b8b8; --faint:#6b6b6b; --border:#2a2a2a; --card:#141414; }
+        * { box-sizing: border-box; }
+        body { background: var(--bg); color: var(--fg); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; line-height: 1.7; }
+        .wrap { max-width: 740px; margin: 0 auto; padding: 64px 24px 96px; }
+        a { color: #a5b4fc; }
+        h1 { font-size: 36px; margin: 0 0 12px; letter-spacing: -0.02em; }
+        h2 { font-size: 20px; margin: 40px 0 10px; }
+        p, li { color: var(--dim); font-size: 15px; }
+        .lede { font-size: 16px; margin-bottom: 32px; color: var(--dim); }
+        .crumb { color: var(--faint); font-size: 13px; margin-bottom: 40px; }
+        .crumb a { color: var(--faint); text-decoration: none; }
+        .updated { color: var(--faint); font-size: 13px; margin-top: 8px; }
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px 22px; margin: 20px 0; }
+        table { border-collapse: collapse; width: 100%; margin: 14px 0; font-size: 14px; }
+        th, td { border: 1px solid var(--border); padding: 10px 12px; text-align: left; color: var(--dim); }
+        th { background: #141414; color: var(--fg); font-weight: 600; }
+        footer { border-top: 1px solid var(--border); padding: 24px; text-align: center; color: var(--faint); font-size: 13px; }
+        footer a { color: var(--dim); text-decoration: none; margin: 0 8px; }
+        code { background: #1a1a1a; border: 1px solid var(--border); padding: 2px 6px; border-radius: 4px; font-size: 13px; }
+    </style>
+</head>
+<body>
+
+<div class="wrap">
+    <div class="crumb"><a href="index.html">← Rephraser</a></div>
+
+    <h1>Privacy Policy</h1>
+    <p class="updated">Last updated: 18 April 2026</p>
+
+    <p class="lede">
+        TL;DR — <strong>Rephraser does not send your text anywhere, ever.</strong>
+        All rephrasing runs on your own device via Apple MLX (Mac) or llama.cpp
+        (Windows). This page covers the two narrow exceptions: model downloads
+        and anonymous telemetry.
+    </p>
+
+    <h2>What we don't collect</h2>
+    <div class="card">
+        <ul>
+            <li>Your text — input, output, or anything in between.</li>
+            <li>File paths, filenames, or URLs you visit.</li>
+            <li>Screenshots, clipboard snapshots, or keystroke logs.</li>
+            <li>Your IP address (stored or forwarded).</li>
+            <li>Email, name, or any account information. Rephraser has no accounts.</li>
+        </ul>
+    </div>
+
+    <h2>What we do collect (when you opt in)</h2>
+    <p>
+        Rephraser can send anonymous usage events to
+        <a href="https://telemetrydeck.com" target="_blank" rel="noopener">TelemetryDeck</a>,
+        a GDPR-friendly, privacy-focused analytics service. You can toggle this
+        off any time in Settings &rarr; <em>Share anonymous usage analytics</em>.
+        It's on by default because the signal helps us prioritise features; it
+        contains no text content.
+    </p>
+
+    <table>
+        <thead><tr><th>Event</th><th>When</th><th>Fields sent</th></tr></thead>
+        <tbody>
+            <tr><td><code>appLaunched</code></td><td>App starts</td><td>OS, anonymous client hash, session id</td></tr>
+            <tr><td><code>rephraseStarted</code></td><td>You press the hotkey</td><td>+ mode (e.g. "professional")</td></tr>
+            <tr><td><code>rephraseAccepted</code></td><td>You hit Enter</td><td>same as above</td></tr>
+            <tr><td><code>rephraseRejected</code></td><td>You hit Escape</td><td>same as above</td></tr>
+            <tr><td><code>modelDownloaded</code></td><td>Model fetch completes</td><td>+ model id (e.g. "qwen2.5-0.5b")</td></tr>
+            <tr><td><code>modeChanged</code></td><td>You pick a mode</td><td>+ new mode</td></tr>
+        </tbody>
+    </table>
+
+    <p>
+        The anonymous client hash is a one-way SHA-256 of a random UUID we
+        generate on first launch. It lets us count returning users without
+        identifying them — we couldn't reverse it to find you even if we
+        wanted to.
+    </p>
+
+    <h2>Email on download</h2>
+    <p>
+        When you download Rephraser from
+        <a href="index.html">rephraser.app</a>, we ask for your email. It's
+        stored in a private Google Sheet we use to send the occasional release
+        announcement. Unsubscribe by replying to any email. We don't share it.
+    </p>
+
+    <h2>Model downloads</h2>
+    <p>
+        The AI model weights live on
+        <a href="https://huggingface.co" target="_blank" rel="noopener">HuggingFace</a>.
+        When you download a model, a direct connection from your machine to
+        HuggingFace's CDN transfers the file. Rephraser doesn't proxy this —
+        see HuggingFace's own privacy policy for what they log.
+    </p>
+
+    <h2>Crash reports (Windows only, coming in v0.2)</h2>
+    <p>
+        Windows ships on much more diverse hardware than Mac, so we'll add
+        crash reporting via
+        <a href="https://sentry.io" target="_blank" rel="noopener">Sentry</a>
+        in v0.2. Stack traces only — we strip any text content, file paths, or
+        PII before sending. Gated by the same analytics toggle.
+    </p>
+
+    <h2>Website analytics</h2>
+    <p>
+        The download site uses
+        <a href="https://www.goatcounter.com" target="_blank" rel="noopener">GoatCounter</a> —
+        a privacy-first page-view counter that doesn't use cookies, doesn't
+        track individuals, and doesn't send data to Google.
+    </p>
+
+    <h2>GDPR / CCPA</h2>
+    <p>
+        Telemetry is anonymous by design — we can't identify an individual
+        user. For email list removal or any data question, email
+        <a href="mailto:srivatsan@vatsan.app">srivatsan@vatsan.app</a>. We
+        reply within 7 days.
+    </p>
+
+    <h2>Changes</h2>
+    <p>
+        If this policy materially changes, we'll update the "Last updated"
+        date at the top and note the change in the
+        <a href="https://github.com/vatsan95/Rephraser/releases">release notes</a>.
+    </p>
+</div>
+
+<footer>
+    <span>&copy; 2026 Rephraser</span>
+    <div style="margin-top:6px;">
+        <a href="index.html">Home</a>
+        <a href="windows.html">Windows</a>
+        <a href="https://github.com/vatsan95/Rephraser">GitHub</a>
+    </div>
+</footer>
+
+</body>
+</html>

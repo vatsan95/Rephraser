@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rephraser — Free AI Text Rewriter for macOS | On-Device, Private, Offline</title>
-    <meta name="description" content="Free on-device AI text rewriting app for macOS. Rephrase, rewrite, and fix grammar in any app with a keyboard shortcut. 100% private — runs locally on Apple Silicon via MLX. No cloud, no API keys, no subscription.">
-    <meta name="keywords" content="text rewriter mac, rephrase tool macOS, AI writing assistant mac, grammar fixer mac, on-device AI mac, private AI writing tool, Apple Silicon AI app, MLX AI app, free paraphrasing tool mac, rewrite text offline, Apple Intelligence alternative, writing tools mac">
+    <title>Rephraser — Free AI Text Rewriter for Mac and Windows | On-Device, Private, Offline</title>
+    <meta name="description" content="Free on-device AI text rewriting app for Mac and Windows. Rephrase, rewrite, and fix grammar in any app with a keyboard shortcut. 100% private — runs locally via Apple MLX or llama.cpp. No cloud, no API keys, no subscription.">
+    <meta name="keywords" content="text rewriter mac, text rewriter windows, rephrase tool, AI writing assistant, grammar fixer, on-device AI, private AI writing tool, Apple Silicon AI app, free paraphrasing tool, rewrite text offline, Apple Intelligence alternative, grammarly alternative, writing tools windows">
     <meta name="theme-color" content="#0a0a0a">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://vatsan95.github.io/Rephraser/">
 
     <!-- Open Graph -->
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Rephraser — Free AI Text Rewriter for macOS">
+    <meta property="og:title" content="Rephraser — Free AI Text Rewriter for Mac and Windows">
     <meta property="og:description" content="Rephrase text in any Mac app with one shortcut. 100% on-device AI — no cloud, no API keys, no cost. 9 writing modes, diff view, works offline.">
     <meta property="og:url" content="https://vatsan95.github.io/Rephraser/">
     <meta property="og:site_name" content="Rephraser">
@@ -22,7 +22,7 @@
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Rephraser — Free AI Text Rewriter for macOS">
+    <meta name="twitter:title" content="Rephraser — Free AI Text Rewriter for Mac and Windows">
     <meta name="twitter:description" content="Rephrase text in any Mac app with one shortcut. 100% on-device AI — no cloud, no API keys, no cost. 9 writing modes, diff view, works offline.">
     <meta name="twitter:image" content="https://vatsan95.github.io/Rephraser/og-image.png">
 
@@ -38,7 +38,7 @@
         "name": "Rephraser",
         "description": "Free on-device AI text rewriting app for macOS. Rephrase, rewrite, and fix grammar in any app with a keyboard shortcut. Runs locally on Apple Silicon.",
         "applicationCategory": "UtilitiesApplication",
-        "operatingSystem": "macOS 14+",
+        "operatingSystem": "macOS 14+, Windows 10, Windows 11",
         "offers": {
             "@type": "Offer",
             "price": "0",
@@ -545,18 +545,33 @@
     <div class="hero-cta">
         <a href="#" class="btn" onclick="openEmailGate(event)">
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
-            Download for Mac
+            <span id="heroBtnLabel">Download for Mac</span>
         </a>
         <a href="https://github.com/vatsan95/Rephraser" class="hero-star">&#9733; Star on GitHub</a>
-        <span class="hero-meta">macOS 14+ · Apple Silicon · Free</span>
+        <span class="hero-meta" id="heroMeta">macOS 14+ · Apple Silicon · Free</span>
+        <div class="os-toggle" style="width:100%;text-align:center;margin-top:10px;font-size:12px;color:var(--faint);">
+            <a href="#" id="osToggleMac" onclick="setOS('mac');return false;" style="color:inherit;margin:0 6px;">Mac</a>
+            ·
+            <a href="#" id="osToggleWin" onclick="setOS('windows');return false;" style="color:inherit;margin:0 6px;">Windows</a>
+            <span style="margin:0 6px;color:var(--faint);">·</span>
+            <a href="windows.html" style="color:inherit;">Windows install guide →</a>
+        </div>
     </div>
     <div class="install-toast" id="installToast">
         <button onclick="document.getElementById('installToast').classList.remove('show')" class="toast-close">✕</button>
-        <strong>How to install:</strong><br>
-        1. Open the downloaded <strong>Rephraser-Installer.dmg</strong><br>
-        2. Drag <strong>Rephraser</strong> into the <strong>Applications</strong> folder<br>
-        3. If macOS blocks it, run this in Terminal:<br>
-        <code class="toast-cmd">xattr -d com.apple.quarantine /Applications/Rephraser.app</code>
+        <div id="installToastMac">
+            <strong>How to install on Mac:</strong><br>
+            1. Open the downloaded <strong>Rephraser-Installer.dmg</strong><br>
+            2. Drag <strong>Rephraser</strong> into the <strong>Applications</strong> folder<br>
+            3. If macOS blocks it, run this in Terminal:<br>
+            <code class="toast-cmd">xattr -d com.apple.quarantine /Applications/Rephraser.app</code>
+        </div>
+        <div id="installToastWin" style="display:none;">
+            <strong>How to install on Windows:</strong><br>
+            1. Run the downloaded <strong>Rephraser-setup.exe</strong><br>
+            2. If SmartScreen blocks it, click <strong>More info → Run anyway</strong><br>
+            3. See the <a href="windows.html" style="color:#fff;text-decoration:underline;">Windows guide</a> for screenshots &amp; the public VirusTotal scan.
+        </div>
         <div class="toast-divider"></div>
         <div class="toast-donate">
             Enjoying Rephraser? <a href="https://paypal.me/vatsanIN" target="_blank" rel="noopener" class="toast-donate-link">Buy me a coffee ☕</a>
@@ -794,9 +809,9 @@
     <p>One shortcut. Nine modes. Fully private. Runs on your Mac.</p>
     <a href="#" class="btn" onclick="openEmailGate(event)">
         <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
-        Download for Mac
+        <span id="ctaBtnLabel">Download for Mac</span>
     </a>
-    <p style="font-size:12px; color:var(--faint); margin-top:16px;">macOS 14 (Sonoma) · Apple Silicon (M1+) · ~0.8 GB for default AI model</p>
+    <p style="font-size:12px; color:var(--faint); margin-top:16px;" id="ctaMeta">macOS 14 (Sonoma) · Apple Silicon (M1+) · ~0.8 GB for default AI model</p>
 </section>
 
 <!-- FAQ -->
@@ -866,17 +881,56 @@
     <div style="margin-bottom:12px;">
         <a href="https://www.producthunt.com/products/rephraser/reviews/new?utm_source=badge-product_review&utm_medium=badge&utm_source=badge-rephraser" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/product_review.svg?product_id=1204398&theme=dark" alt="Rephraser - Rewrite text in any Mac app. 100% on-device AI. Free. | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
     </div>
-    <span>&copy; 2026 Rephraser · macOS</span>
+    <span>&copy; 2026 Rephraser · Mac &amp; Windows</span>
     <div class="f-links">
         <a href="https://github.com/vatsan95/Rephraser">GitHub</a>
         <a href="https://github.com/vatsan95/Rephraser/releases">Releases</a>
+        <a href="windows.html">Windows</a>
+        <a href="privacy.html">Privacy</a>
         <a href="https://github.com/vatsan95/Rephraser/issues">Feedback</a>
     </div>
 </footer>
 
 <!-- Scroll fade-in + download toast + email gate -->
 <script>
-    const DOWNLOAD_URL = 'https://github.com/vatsan95/Rephraser/releases/download/v1.0.0/Rephraser-Installer.dmg';
+    // Use /releases/latest/download/ so the link always points to the newest asset
+    // without needing a website redeploy on every version bump.
+    const MAC_URL = 'https://github.com/vatsan95/Rephraser/releases/latest/download/Rephraser-Installer.dmg';
+    const WIN_URL = 'https://github.com/vatsan95/Rephraser/releases/latest/download/Rephraser-setup.exe';
+    let CURRENT_OS = 'mac';
+
+    function detectOS() {
+        // Prefer the modern client-hints API, fall back to UA string.
+        const platform = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || '';
+        const ua = navigator.userAgent || '';
+        if (/Win/i.test(platform) || /Windows/i.test(ua)) return 'windows';
+        if (/Mac/i.test(platform) || /Macintosh/i.test(ua)) return 'mac';
+        return 'mac'; // Linux / Android / iOS / unknown → show Mac by default; manual toggle available
+    }
+
+    function setOS(os) {
+        CURRENT_OS = os;
+        const isWin = os === 'windows';
+        const heroLabel = document.getElementById('heroBtnLabel');
+        const ctaLabel = document.getElementById('ctaBtnLabel');
+        const heroMeta = document.getElementById('heroMeta');
+        const ctaMeta = document.getElementById('ctaMeta');
+        if (heroLabel) heroLabel.textContent = isWin ? 'Download for Windows' : 'Download for Mac';
+        if (ctaLabel) ctaLabel.textContent = isWin ? 'Download for Windows' : 'Download for Mac';
+        if (heroMeta) heroMeta.textContent = isWin
+            ? 'Windows 10 / 11 · x64 · Free · ~0.8 GB for default AI model'
+            : 'macOS 14+ · Apple Silicon · Free';
+        if (ctaMeta) ctaMeta.textContent = isWin
+            ? 'Windows 10 / 11 · x64 · Free · ~0.8 GB for default AI model'
+            : 'macOS 14 (Sonoma) · Apple Silicon (M1+) · ~0.8 GB for default AI model';
+        const mac = document.getElementById('osToggleMac');
+        const win = document.getElementById('osToggleWin');
+        if (mac) mac.style.fontWeight = isWin ? '400' : '700';
+        if (win) win.style.fontWeight = isWin ? '700' : '400';
+    }
+
+    // Run OS detection as early as possible so buttons show the right label.
+    setOS(detectOS());
 
     // Scroll fade-in
     const observer = new IntersectionObserver((entries) => {
@@ -925,6 +979,7 @@
     function openEmailGate(e) {
         e.preventDefault();
         trackEvent('download-click');
+        trackEvent('download-click-' + CURRENT_OS);
         document.getElementById('emailOverlay').classList.add('show');
         setTimeout(() => document.getElementById('emailInput').focus(), 200);
     }
@@ -959,21 +1014,26 @@
         btn.textContent = 'Sending...';
 
         // Submit to Google Sheets (tracking) + FormSubmit (email notification)
+        const downloadUrl = CURRENT_OS === 'windows' ? WIN_URL : MAC_URL;
         Promise.all([
             fetch('https://script.google.com/macros/s/AKfycby9eemA9YDa37xwSiqly0sbb6eoNhMbtYk841syI8qLPl9DGXLHHSqomjTnAGuRew4xFQ/exec', {
                 method: 'POST',
-                body: JSON.stringify({ email: email })
+                body: JSON.stringify({ email: email, os: CURRENT_OS })
             }),
             fetch('https://formsubmit.co/ajax/7e114eb208eff7d2c682a8007dbb7034d27bc7bc36165d6510fcf1a303c3819b', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                body: JSON.stringify({ email: email, _subject: 'New Rephraser Download', _template: 'table' })
+                body: JSON.stringify({ email: email, os: CURRENT_OS, _subject: 'New Rephraser Download (' + CURRENT_OS + ')', _template: 'table' })
             })
         ]).then(([sheetRes]) => {
             // Trigger download regardless — sheet is the source of truth
             trackEvent('download-started');
+            trackEvent('download-started-' + CURRENT_OS);
             closeEmailGate();
-            window.open(DOWNLOAD_URL, '_blank');
+            window.open(downloadUrl, '_blank');
+            // Swap the toast body to match the OS the user actually downloaded for.
+            document.getElementById('installToastMac').style.display = CURRENT_OS === 'mac' ? 'block' : 'none';
+            document.getElementById('installToastWin').style.display = CURRENT_OS === 'windows' ? 'block' : 'none';
             const t = document.getElementById('installToast');
             t.classList.add('show');
         }).catch(() => {

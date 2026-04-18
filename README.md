@@ -2,7 +2,14 @@
 
 **Rephrase text in any app with a single keyboard shortcut. Powered by on-device AI.**
 
-Rephraser is a lightweight macOS menu bar app that lets you select text anywhere — Slack, Gmail, Notion, VS Code, Discord, your browser — press `⌥⇧R`, and instantly get a polished version. AI runs entirely on your Mac using [MLX](https://github.com/ml-explore/mlx-swift). No API keys, no cloud, no cost.
+Rephraser is a lightweight tray app for **macOS** and **Windows** that lets you select text anywhere — Slack, Gmail, Notion, VS Code, Discord, your browser — press the hotkey, and instantly get a polished version. AI runs entirely on your device via [MLX](https://github.com/ml-explore/mlx-swift) on Mac and [llama.cpp](https://github.com/ggerganov/llama.cpp) on Windows. No API keys, no cloud, no cost.
+
+| Platform | Hotkey | Install |
+|----------|--------|---------|
+| macOS 14+ (Apple Silicon) | `⌥⇧R` | [Download DMG](https://github.com/vatsan95/Rephraser/releases/latest) |
+| Windows 10/11 (x64) | `Ctrl+Alt+R` | [Download EXE](https://github.com/vatsan95/Rephraser/releases/latest) · [Install guide](https://vatsan95.github.io/Rephraser/windows.html) |
+
+Windows development docs live under [`windows/README.md`](windows/README.md).
 
 ## How It Works
 
