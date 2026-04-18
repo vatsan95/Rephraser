@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "source": "Rephraser/Models/RephraseMode.swift (Mac source of truth, lines 62-167)",
+  "modes": [
+    {
+      "id": "professional",
+      "displayName": "Professional",
+      "icon": "briefcase",
+      "systemPrompt": "Rephrase the following text to sound professional and polished, suitable for workplace communication.\nRules:\n- Keep the same meaning and intent\n- Maintain the same language as the input\n- Fix any grammar or spelling errors\n- Use a confident, respectful tone\n- Do not add information not present in the original\n- Return ONLY the rephrased text with no explanation or preamble"
+    },
+    {
+      "id": "casual",
+      "displayName": "Casual",
+      "icon": "face.smiling",
+      "systemPrompt": "Rephrase the following text to sound casual and friendly, like a message to a colleague you're comfortable with.\nRules:\n- Keep the same meaning and intent\n- Maintain the same language as the input\n- Fix any grammar or spelling errors\n- Use a warm, approachable tone\n- Do not add information not present in the original\n- Return ONLY the rephrased text with no explanation or preamble"
+    },
+    {
+      "id": "concise",
+      "displayName": "Concise",
+      "icon": "arrow.down.right.and.arrow.up.left",
+      "systemPrompt": "Rephrase the following text to be as concise as possible while preserving the full meaning.\nRules:\n- Remove unnecessary words, filler, and redundancy\n- Keep the same meaning, intent, and tone\n- Maintain the same language as the input\n- Fix any grammar or spelling errors\n- Do not remove important details or nuance\n- Return ONLY the rephrased text with no explanation or preamble"
+    },
+    {
+      "id": "elaborate",
+      "displayName": "Elaborate",
+      "icon": "arrow.up.left.and.arrow.down.right",
+      "systemPrompt": "Rephrase the following text with more detail and context, making it clearer and more comprehensive.\nRules:\n- Expand on the ideas naturally without adding false information\n- Keep the same meaning and intent\n- Maintain the same language as the input\n- Fix any grammar or spelling errors\n- Use smooth transitions between ideas\n- Return ONLY the rephrased text with no explanation or preamble"
+    },
+    {
+      "id": "fixGrammar",
+      "displayName": "Fix Grammar",
+      "icon": "checkmark.circle",
+      "systemPrompt": "Fix only the grammar, spelling, and punctuation in the following text. Do NOT change the wording, tone, or style.\nRules:\n- Correct grammar, spelling, and punctuation errors only\n- Keep the original wording as close as possible\n- Do not rephrase, restructure, or change the tone\n- Maintain the same language as the input\n- Return ONLY the corrected text with no explanation or preamble"
+    },
+    {
+      "id": "confident",
+      "displayName": "Confident",
+      "icon": "flame",
+      "systemPrompt": "Rephrase the following text to sound confident, assertive, and decisive.\nRules:\n- Replace hedging language (maybe, I think, perhaps, kind of) with direct statements\n- Use active voice and strong verbs\n- Keep the same meaning and intent\n- Maintain the same language as the input\n- Fix any grammar or spelling errors\n- Do not change the core message or add new information\n- Return ONLY the rephrased text with no explanation or preamble"
+    },
+    {
+      "id": "empathetic",
+      "displayName": "Empathetic",
+      "icon": "heart",
+      "systemPrompt": "Rephrase the following text to sound empathetic, warm, and understanding.\nRules:\n- Acknowledge feelings and perspectives where appropriate\n- Use gentle, supportive language\n- Keep the same meaning and intent\n- Maintain the same language as the input\n- Fix any grammar or spelling errors\n- Do not change the core message or add new information\n- Return ONLY the rephrased text with no explanation or preamble"
+    },
+    {
+      "id": "summarize",
+      "displayName": "Summarize",
+      "icon": "doc.plaintext",
+      "systemPrompt": "Summarize the following text into a brief, clear summary that captures the essential meaning.\nRules:\n- Condense to 1-3 sentences maximum\n- Capture the key message and important details\n- Maintain the same language as the input\n- Use clear, simple language\n- Do not add interpretation or opinion\n- Return ONLY the summary with no explanation or preamble"
+    },
+    {
+      "id": "keyPoints",
+      "displayName": "Key Points",
+      "icon": "list.bullet",
+      "systemPrompt": "Extract the key points from the following text as a clean bulleted list.\nRules:\n- Use bullet points (- ) for each key point\n- Each point should be one clear, concise sentence\n- Capture all important information\n- Maintain the same language as the input\n- Order points by importance\n- Return ONLY the bulleted list with no explanation or preamble"
+    }
+  ]
+}

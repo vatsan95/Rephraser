@@ -3,6 +3,7 @@
 mod clipboard;
 mod context;
 mod hotkey;
+mod inference;
 
 use tauri::{
     menu::{Menu, MenuItem},
@@ -31,6 +32,28 @@ async fn capture_selection() -> Result<serde_json::Value, String> {
         "source_process": process,
         "suggested_mode": mode,
     }))
+}
+
+/// Phase 3: load a GGUF model from disk (download flow lands in Phase 5).
+#[tauri::command]
+async fn load_model(path: String) -> Result<(), String> {
+    inference::load_model(std::path::PathBuf::from(path))
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Phase 3: is a model currently loaded in memory?
+#[tauri::command]
+async fn is_model_loaded() -> bool {
+    inference::is_loaded().await
+}
+
+/// Phase 3: stream a rephrase — emits `rephrase://token` + `rephrase://done`.
+#[tauri::command]
+async fn rephrase(app: tauri::AppHandle, text: String, mode: String) -> Result<(), String> {
+    inference::rephrase(app, text, mode)
+        .await
+        .map_err(|e| e.to_string())
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -80,7 +103,13 @@ pub fn run() {
 
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![ping, capture_selection])
+        .invoke_handler(tauri::generate_handler![
+            ping,
+            capture_selection,
+            load_model,
+            is_model_loaded,
+            rephrase
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
