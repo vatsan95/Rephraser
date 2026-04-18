@@ -19,9 +19,25 @@ permissions:
   contents: read
 
 jobs:
+  # cargo-deny runs on Linux because the official action ships as a Linux
+  # container. Cheap supply-chain gate — licenses + advisories + source
+  # registry allow-list. Fails the workflow before we burn a Windows build
+  # on a doomed PR.
+  deny:
+    name: cargo-deny (licenses + advisories)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: EmbarkStudios/cargo-deny-action@v2
+        with:
+          manifest-path: windows/app/src-tauri/Cargo.toml
+          command: check
+          command-arguments: "--hide-inclusion-graph"
+
   build:
     name: Build Rephraser on windows-latest
     runs-on: windows-latest
+    needs: deny
     timeout-minutes: 60
 
     steps:
@@ -59,14 +75,6 @@ jobs:
         run: |
           cargo fmt --check
           cargo clippy --release -- -D warnings
-
-      - name: cargo-deny (licenses + advisories + sources)
-        uses: EmbarkStudios/cargo-deny-action@v2
-        with:
-          manifest-path: windows/app/src-tauri/Cargo.toml
-          arguments: --all-features
-          command: check
-          command-arguments: "--hide-inclusion-graph"
 
       - name: Build Tauri app (MSI + NSIS)
         shell: pwsh
