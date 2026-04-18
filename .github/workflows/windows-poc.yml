@@ -51,7 +51,10 @@ jobs:
           rustc --version
           cargo --version
           cmake --version
-          cl.exe 2>&1 | Select-Object -First 1
+          # cl.exe is not on PATH in pwsh by default (needs vcvarsall).
+          # llama-cpp-2's cc crate locates MSVC on its own; this is diagnostic only.
+          $cl = Get-Command cl.exe -ErrorAction SilentlyContinue
+          if ($cl) { Write-Host "cl.exe: $($cl.Source)" } else { Write-Host "cl.exe: not on PATH (expected; cc crate locates MSVC)" }
 
       - name: Lint (fmt + clippy)
         shell: pwsh
