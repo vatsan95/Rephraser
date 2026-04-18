@@ -1,0 +1,11 @@
+{
+  "version": "0.1.0",
+  "notes": "Initial Windows release of Rephraser. Updater feed is a placeholder; signing lands in v0.2.",
+  "pub_date": "2026-04-18T00:00:00Z",
+  "platforms": {
+    "windows-x86_64": {
+      "signature": "",
+      "url": "https://github.com/vatsan95/Rephraser/releases/latest/download/Rephraser-setup.exe"
+    }
+  }
+}

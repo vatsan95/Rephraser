@@ -1,0 +1,6 @@
+# Pins the Rust toolchain for the Windows port. The Mac app doesn't use
+# Rust, so this only affects the windows/ tree and CI.
+[toolchain]
+channel = "stable"
+components = ["clippy", "rustfmt"]
+profile = "minimal"

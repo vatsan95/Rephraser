@@ -60,6 +60,14 @@ jobs:
           cargo fmt --check
           cargo clippy --release -- -D warnings
 
+      - name: cargo-deny (licenses + advisories + sources)
+        uses: EmbarkStudios/cargo-deny-action@v2
+        with:
+          manifest-path: windows/app/src-tauri/Cargo.toml
+          arguments: --all-features
+          command: check
+          command-arguments: "--hide-inclusion-graph"
+
       - name: Build Tauri app (MSI + NSIS)
         shell: pwsh
         working-directory: windows/app
@@ -103,3 +111,17 @@ jobs:
           path: windows/app/src-tauri/target/release/bundle/nsis/*.exe
           retention-days: 14
           if-no-files-found: warn
+
+      # VirusTotal scan — non-blocking; only runs when VT_API_KEY is set.
+      # Fails soft so forks / PRs without the secret keep building.
+      - name: VirusTotal scan (NSIS)
+        if: ${{ success() && env.VT_API_KEY != '' }}
+        continue-on-error: true
+        env:
+          VT_API_KEY: ${{ secrets.VT_API_KEY }}
+        uses: crazy-max/ghaction-virustotal@v4
+        with:
+          vt_api_key: ${{ secrets.VT_API_KEY }}
+          files: |
+            windows/app/src-tauri/target/release/bundle/nsis/*.exe
+            windows/app/src-tauri/target/release/bundle/msi/*.msi

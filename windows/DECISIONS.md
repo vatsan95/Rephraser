@@ -82,6 +82,36 @@ Each entry: date, decision, context, consequences.
 
 ---
 
+## 2026-04-18 — Phase 7: cargo-deny + VirusTotal, updater signing deferred
+
+**Context:** Phase 7 plan calls for signing (MSI code-sign + Tauri updater
+signing), VirusTotal scan, license gates. No code-signing cert purchased
+yet, and no `TAURI_SIGNING_PRIVATE_KEY` generated. We do not want to block
+Phase 7 on those purchases.
+
+**Decision:**
+- Ship Phase 7 with `cargo-deny` license + advisory + source gate via
+  `windows/app/src-tauri/deny.toml`.
+- VirusTotal scan wired into `windows-build.yml` but conditional on
+  `secrets.VT_API_KEY`; fails soft (`continue-on-error`) so forks still build.
+- `tauri-plugin-updater` wiring deferred until `TAURI_SIGNING_PRIVATE_KEY`
+  is generated and added as a GH Actions secret. `docs/windows/latest.json`
+  is shipped as a stub so the feed URL is reserved.
+- MSI code-signing (Certum $70/yr) deferred per plan — revisit after the
+  first 100 downloads (SmartScreen reputation argument evaporates once the
+  binary is signed by any OV cert).
+- `rust-toolchain.toml` pins `stable` so CI + local dev agree.
+
+**Consequences:**
+- v0.1 ships unsigned → SmartScreen "Unknown publisher" warning. Documented
+  on `docs/windows.html` with screenshots (Phase 9).
+- `cargo-deny` allow-list is tight (no GPL, no unmaintained); adding a new
+  crate may require a deny.toml update.
+- `multiple-versions = "allow"` because Tauri and llama.cpp each pull a
+  different `windows-sys` major. Revisit when both upgrade.
+
+---
+
 ## Pending decisions (fill in as reached)
 
 
