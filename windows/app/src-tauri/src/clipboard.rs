@@ -24,6 +24,7 @@ pub fn snapshot() -> Option<String> {
 }
 
 /// Write text to the clipboard.
+#[allow(dead_code)] // wired up in Phase 3 (accept/dismiss flow)
 pub fn restore(text: &str) -> Result<()> {
     Clipboard::new()
         .context("Failed to open clipboard")?
@@ -58,6 +59,7 @@ pub fn capture_selection(previous: Option<&str>) -> Result<String> {
 }
 
 /// Synthesize Ctrl+V to paste the current clipboard at the caret.
+#[allow(dead_code)] // wired up in Phase 4 (panel accept)
 pub fn synth_paste() -> Result<()> {
     let mut enigo = Enigo::new(&Settings::default()).context("Failed to init enigo")?;
     enigo
