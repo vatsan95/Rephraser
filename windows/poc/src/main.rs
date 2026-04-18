@@ -28,11 +28,12 @@ use tracing::{info, warn};
 #[command(author, version, about = "Rephraser Windows PoC — Phase 0 gate", long_about = None)]
 struct Args {
     /// HuggingFace repo ID for the GGUF model.
-    #[arg(long, default_value = "bartowski/gemma-3-1b-it-GGUF")]
+    /// Default is Qwen2.5-0.5B (non-gated) for CI; Phase 5 catalog uses Gemma 3 1B.
+    #[arg(long, default_value = "bartowski/Qwen2.5-0.5B-Instruct-GGUF")]
     repo: String,
 
     /// Filename within the repo.
-    #[arg(long, default_value = "gemma-3-1b-it-Q4_K_M.gguf")]
+    #[arg(long, default_value = "Qwen2.5-0.5B-Instruct-Q4_K_M.gguf")]
     filename: String,
 
     /// Prompt to rephrase (wrapped in the Rephraser "Professional" mode system prompt).
@@ -92,10 +93,10 @@ async fn main() -> Result<()> {
         .context("Failed to load GGUF model")?;
     info!("Model loaded in {:.2}s", t0.elapsed().as_secs_f32());
 
-    // -------- Step 3: Build chat prompt (Gemma 3 format) --------
-    // Gemma 3 chat template: <start_of_turn>user\n{system}\n\n{user}<end_of_turn>\n<start_of_turn>model\n
+    // -------- Step 3: Build chat prompt (ChatML format — Qwen2.5) --------
+    // ChatML: <|im_start|>system\n{sys}<|im_end|>\n<|im_start|>user\n{u}<|im_end|>\n<|im_start|>assistant\n
     let full_prompt = format!(
-        "<start_of_turn>user\n{system}\n\n{user}<end_of_turn>\n<start_of_turn>model\n",
+        "<|im_start|>system\n{system}<|im_end|>\n<|im_start|>user\n{user}<|im_end|>\n<|im_start|>assistant\n",
         system = SYSTEM_PROMPT,
         user = args.prompt
     );

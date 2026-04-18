@@ -88,9 +88,11 @@ jobs:
           # HuggingFace anonymous rate limit is usually fine; set token if added.
           HF_HUB_ENABLE_HF_TRANSFER: "0"
         run: |
+          # Gemma 3 is license-gated on HF; use non-gated Qwen2.5-0.5B for the CI gate.
+          # Production app will use Gemma 3 1B via in-app license acceptance (Phase 5).
           ./target/release/rephraser-poc.exe `
-            --repo "bartowski/gemma-3-1b-it-GGUF" `
-            --filename "gemma-3-1b-it-Q4_K_M.gguf" `
+            --repo "bartowski/Qwen2.5-0.5B-Instruct-GGUF" `
+            --filename "Qwen2.5-0.5B-Instruct-Q4_K_M.gguf" `
             --prompt "hey can u send me the deck asap thx" `
             --max-tokens 64
 
