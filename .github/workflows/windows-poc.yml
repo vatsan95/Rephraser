@@ -61,7 +61,7 @@ jobs:
         working-directory: windows/poc
         run: |
           cargo fmt --check
-          cargo clippy --release --locked -- -D warnings
+          cargo clippy --release -- -D warnings
 
       - name: Build (release)
         shell: pwsh
