@@ -65,9 +65,26 @@ Each entry: date, decision, context, consequences.
 
 ---
 
+## 2026-04-18 — Phase 0 gate PASSED: stack confirmed (llama-cpp-2)
+
+**Result on `windows-latest` CI (run 24606706480, commit 561fbb9):**
+- Binary: **7.18 MB** (gate: <80 MB) — 11× under budget
+- Inference: **54.80 tok/s** on Qwen2.5-0.5B Q4_K_M (gate: ≥3 tok/s) — 18× over
+- Output: `"Sure, I can send you the deck asap. Thank you!"` — clean EOS stop, 46 chars
+- `llama-cpp-2 = "0.1.143"` with new `LlamaSampler` API
+
+**Decision:** keep Tauri 2 + Rust + `llama-cpp-2`. No fallback to `mistral.rs` or `candle` needed.
+
+**Notes for future phases:**
+- Gemma 3 on HF is license-gated (401 without token). Production model-download UX (Phase 5) must integrate HF token + license acceptance. CI gate uses non-gated Qwen2.5-0.5B instead.
+- `llama-cpp-2` caret ranges are dangerous — pinning `=0.1.54` resolved to 0.1.143 of `llama-cpp-sys-2` with incompatible bindings. Pin **both** crates explicitly at each version upgrade.
+- Deprecated APIs in 0.1.143 (`token_to_str`, `Special::Tokenize`) still work but trip `-D warnings`; PoC uses `#![allow(deprecated)]`. Migrate to `token_to_piece` in Phase 3.
+
+---
+
 ## Pending decisions (fill in as reached)
 
-- **Phase 0 outcome:** stack confirmed or switched? Which backend?
+
 - **Hotkey default:** Ctrl+Alt+R vs alternative if conflict detected in onboarding
 - **Code signing:** Certum Open-Source cert (~$70/yr) — purchased when? target: after 100 downloads
 - **Microsoft Store:** MSIX submission — target v0.3
