@@ -51,64 +51,6 @@
     }
     </script>
 
-    <!-- Structured Data: FAQPage (Windows FAQ) -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        "mainEntity": [
-            {
-                "@type": "Question",
-                "name": "Why does Windows say \"Unknown publisher\" when I install Rephraser?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Microsoft SmartScreen warns on any unsigned binary. Rephraser is open-source and will add a code-signing certificate after the first 100 downloads. Every Windows release is scanned by VirusTotal in CI, and the scan URL is attached to the GitHub release notes."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "Does Rephraser for Windows send my text to the cloud?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "No. Inference runs locally on your Windows PC via llama.cpp. The only outbound traffic is downloading an AI model from HuggingFace on your click, plus optional anonymous telemetry (event names and OS only, no text content) which you can disable in Settings."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "My antivirus flagged the Rephraser installer. Is it safe?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Rust binaries that call SendInput and read the clipboard sometimes trip heuristic antivirus engines. Each GitHub release carries a VirusTotal scan link. If fewer than 3 engines flag the file, it is almost certainly a false positive. The full source code is available on GitHub."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "Does the Ctrl + Alt + R hotkey conflict with other Windows apps?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Ctrl + Alt + R can collide with Outlook's Reply All and some Adobe shortcuts. If Rephraser cannot register it at startup, onboarding prompts you to pick another. You can change the hotkey any time in Settings."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "Will Rephraser support Windows on ARM64 (Snapdragon X, Copilot+ PCs)?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Planned for v0.2. The v0.1 release is x64 only. Progress is tracked on the GitHub issues page."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "Can I silently install Rephraser for enterprise deployment?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Yes. The MSI supports quiet install via msiexec /i Rephraser-setup.msi /quiet. It is a per-user install with no admin required, installed to %LOCALAPPDATA%\\Programs\\Rephraser\\."
-                }
-            }
-        ]
-    }
-    </script>
-
     <!-- Structured Data: BreadcrumbList -->
     <script type="application/ld+json">
     {
@@ -250,58 +192,15 @@
         <li><span class="pill">Runtime</span> Microsoft Edge WebView2 — the installer adds it automatically if it's missing.</li>
     </ul>
 
-    <h2>Frequently asked questions</h2>
-
-    <h3>Why does Windows say "Unknown publisher"?</h3>
+    <h2>More questions?</h2>
     <p>
-        Microsoft's SmartScreen warns on any unsigned binary. We'll add an OV
-        code-signing cert after the first 100 downloads — signing trades money
-        for trust, and we want a signal users actually want it before we pay.
-        Until then, the source is
-        <a href="https://github.com/vatsan95/Rephraser">on GitHub</a> and every
-        release goes through VirusTotal.
+        SmartScreen, antivirus flags, hotkey conflicts, ARM64, enterprise silent install,
+        privacy, and offline behaviour are all answered in the
+        <a href="index.html#faq">main FAQ on the Rephraser home page</a> — one place for
+        both Mac and Windows so you don't have to hunt across pages.
     </p>
-
-    <h3>Does Rephraser send my text anywhere?</h3>
-    <p>
-        No. Inference runs locally via llama.cpp. The only outbound traffic is:
-        (1) downloading a model from HuggingFace on <em>your</em> click, and
-        (2) anonymous telemetry (event names + OS only — no text, no paths) which
-        you can disable in Settings. See our
-        <a href="privacy.html">privacy page</a> for the full breakdown.
-    </p>
-
-    <h3>My antivirus flagged it.</h3>
-    <p>
-        Rust binaries that call <code>SendInput</code> and read the clipboard
-        sometimes trip heuristic AV engines. Open the
-        <a href="https://github.com/vatsan95/Rephraser/releases" target="_blank" rel="noopener">release notes</a>
-        for your download — each one carries a VirusTotal scan link. If fewer
-        than 3 engines flag the file, it's almost certainly a false positive.
-        File a GitHub issue and we'll submit for whitelisting.
-    </p>
-
-    <h3>Does the hotkey conflict with anything?</h3>
-    <p>
-        <code>Ctrl + Alt + R</code> collides with Outlook's "Reply All" and some
-        Adobe shortcuts. If Rephraser can't register it, onboarding asks you to
-        pick another. You can change it any time in Settings.
-    </p>
-
-    <h3>Will you support ARM64 (Snapdragon X, Copilot+ PCs)?</h3>
-    <p>Planned for v0.2. Tracked in <a href="https://github.com/vatsan95/Rephraser/issues">GitHub issues</a>.</p>
-
-    <h3>Enterprise / silent install?</h3>
-    <p>
-        The MSI supports <code>msiexec /i Rephraser_0.1.0_x64_en-US.msi /quiet</code>.
-        Per-user install, no admin required. Installs to <code>%LOCALAPPDATA%\Programs\Rephraser\</code>.
-    </p>
-
-    <h2>Support the project</h2>
-    <p>
-        Rephraser is MIT-licensed and kept free. If it saves you time, you can
-        <a href="https://paypal.me/vatsanIN" target="_blank" rel="noopener">buy me a coffee ☕</a>
-        or <a href="https://github.com/vatsan95/Rephraser">star the repo</a>.
+    <p style="margin-top:20px;">
+        <a href="index.html#faq" class="btn" onclick="if(window.goatcounter){window.goatcounter.count({path:'windows-to-main-faq',event:true});}">Read the full FAQ →</a>
     </p>
 </div>
 
