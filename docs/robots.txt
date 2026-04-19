@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://vatsan95.github.io/Rephraser/sitemap.xml
