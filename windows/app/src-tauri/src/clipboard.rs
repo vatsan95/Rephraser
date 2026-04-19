@@ -58,6 +58,50 @@ pub fn capture_selection(previous: Option<&str>) -> Result<String> {
     Err(anyhow!("No selection captured within {POLL_TIMEOUT:?}"))
 }
 
+/// RAII guard: snapshots the clipboard on construction and restores it on
+/// `Drop` unless `disarm()` is called. Ensures that a panic anywhere between
+/// capture and accept/dismiss doesn't strand the user's original clipboard
+/// contents. Mirrors Mac's `defer { restoreClipboard() }`.
+#[allow(dead_code)] // wired up by callers that want panic-safe restore
+pub struct ClipboardGuard {
+    saved: Option<String>,
+    armed: bool,
+}
+
+#[allow(dead_code)]
+impl ClipboardGuard {
+    pub fn snapshot_now() -> Self {
+        Self {
+            saved: snapshot(),
+            armed: true,
+        }
+    }
+
+    pub fn saved(&self) -> Option<&str> {
+        self.saved.as_deref()
+    }
+
+    /// Caller has taken responsibility for clipboard state — don't restore
+    /// on drop. Use this after a successful accept-flow where the final
+    /// clipboard value is intentional.
+    pub fn disarm(mut self) {
+        self.armed = false;
+    }
+}
+
+impl Drop for ClipboardGuard {
+    fn drop(&mut self) {
+        if !self.armed {
+            return;
+        }
+        if let Some(text) = &self.saved {
+            // Best-effort; nothing meaningful we can do on failure during
+            // an unwind or normal drop.
+            let _ = Clipboard::new().and_then(|mut c| c.set_text(text.clone()));
+        }
+    }
+}
+
 /// Synthesize Ctrl+V to paste the current clipboard at the caret.
 #[allow(dead_code)] // wired up in Phase 4 (panel accept)
 pub fn synth_paste() -> Result<()> {

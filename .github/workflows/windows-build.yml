@@ -37,10 +37,24 @@ jobs:
           command: check
           command-arguments: "--hide-inclusion-graph"
 
+  # Secondary supply-chain gate: RustSec advisory DB via cargo-audit.
+  # cargo-deny covers licenses + yanked crates; audit specifically hits
+  # CVEs with finer-grained filtering. Both run because overlap is small
+  # and both are cheap.
+  audit:
+    name: cargo-audit (RustSec advisories)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: rustsec/audit-check@v2.0.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          working-directory: windows/app/src-tauri
+
   build:
     name: Build Rephraser on windows-latest
     runs-on: windows-latest
-    needs: deny
+    needs: [deny, audit]
     timeout-minutes: 60
 
     steps:
@@ -70,7 +84,7 @@ jobs:
       - name: Install frontend deps
         shell: pwsh
         working-directory: windows/app
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Rust fmt + clippy
         shell: pwsh

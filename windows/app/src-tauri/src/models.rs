@@ -10,19 +10,20 @@
 //!   - Atomic write via `.part` temp → rename on success
 //!   - Disk-space precheck (plan A10/E10): abort if free < 2× model size
 //!   - RAM precheck (plan A11): warn if total RAM < minRamGB for the model
+//!   - SHA-256 verification (E14 supply chain): catalog entries carry an
+//!     optional `sha256` field. If set, we hash the `.part` file after
+//!     download completes and refuse to install on mismatch — the partial
+//!     is deleted so the next retry starts clean. If blank, we fall back
+//!     to TLS-only trust (v0.1 behaviour) and just log a warning.
 //!   - Delete a model on request
-//!
-//! SHA verification is deferred: bartowski doesn't publish canonical
-//! hashes per release, so for v0.1 we trust HuggingFace TLS + CDN
-//! integrity. E14 (supply chain) will revisit once the catalog carries
-//! per-file digests.
 
 use anyhow::{anyhow, Context, Result};
 use futures_util::StreamExt;
 use serde::{Deserialize, Serialize};
+use sha2::{Digest, Sha256};
 use std::path::{Path, PathBuf};
 use tauri::{AppHandle, Emitter, Manager};
-use tokio::io::AsyncWriteExt;
+use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
 // ---------- Catalog ----------
 
@@ -36,6 +37,9 @@ pub struct CatalogEntry {
     pub description: String,
     pub repo: String,
     pub filename: String,
+    /// Hex-encoded SHA-256 of the GGUF. Empty = verification skipped.
+    #[serde(default)]
+    pub sha256: String,
     #[serde(rename = "approxSizeMB")]
     pub approx_size_mb: u64,
     #[serde(rename = "minRamGB")]
@@ -303,10 +307,52 @@ pub async fn download(app: AppHandle, id: String) -> Result<PathBuf> {
 
     file.flush().await.ok();
     drop(file);
+
+    // SHA-256 verification before rename. If the catalog pins a digest, we
+    // refuse to install on mismatch and nuke the .part so retries start
+    // clean. Empty digest = fall back to TLS trust (v0.1) and just log.
+    if !entry.sha256.is_empty() {
+        let actual = sha256_file(&tmp).await.context("hash downloaded file")?;
+        let expected = entry.sha256.to_ascii_lowercase();
+        if actual != expected {
+            let _ = tokio::fs::remove_file(&tmp).await;
+            return Err(anyhow!(
+                "SHA-256 mismatch for {}: expected {}, got {}. File deleted; retry the download.",
+                entry.id,
+                expected,
+                actual
+            ));
+        }
+        tracing::info!("SHA-256 verified for {}: {}", entry.id, actual);
+    } else {
+        tracing::warn!(
+            "no SHA-256 pin for {} — trusting TLS only (see shared/models/catalog.json)",
+            entry.id
+        );
+    }
+
     tokio::fs::rename(&tmp, &target)
         .await
         .with_context(|| format!("rename {:?} -> {:?}", tmp, target))?;
     Ok(target)
+}
+
+/// Stream a file through SHA-256 in 1 MiB chunks (avoids loading 2+ GB
+/// GGUFs into RAM for hashing).
+async fn sha256_file(path: &Path) -> Result<String> {
+    let mut f = tokio::fs::File::open(path)
+        .await
+        .with_context(|| format!("open {:?} for hashing", path))?;
+    let mut hasher = Sha256::new();
+    let mut buf = vec![0u8; 1024 * 1024];
+    loop {
+        let n = f.read(&mut buf).await.context("read for hashing")?;
+        if n == 0 {
+            break;
+        }
+        hasher.update(&buf[..n]);
+    }
+    Ok(format!("{:x}", hasher.finalize()))
 }
 
 pub fn delete(app: &AppHandle, id: &str) -> Result<()> {
