@@ -87,11 +87,10 @@
                 immediately whitelisted on your machine.
             </p>
             <p style="font-size:13px;color:var(--faint);">
-                Want proof the installer is clean? See the
-                <a href="https://www.virustotal.com/gui/search/rephraser" target="_blank" rel="noopener">
-                    public VirusTotal scan →
-                </a>
-                Every release is scanned automatically in CI.
+                Want proof the installer is clean? Every Windows release is
+                scanned by VirusTotal in CI — the scan URL is attached to the
+                <a href="https://github.com/vatsan95/Rephraser/releases" target="_blank" rel="noopener">GitHub release notes</a>
+                for the binary you downloaded.
             </p>
         </div>
     </div>
@@ -154,9 +153,10 @@
     <h3>My antivirus flagged it.</h3>
     <p>
         Rust binaries that call <code>SendInput</code> and read the clipboard
-        sometimes trip heuristic AV engines. Check the
-        <a href="https://www.virustotal.com/gui/search/rephraser" target="_blank" rel="noopener">public scan</a>
-        — if fewer than 3 engines flag it, it's almost certainly a false positive.
+        sometimes trip heuristic AV engines. Open the
+        <a href="https://github.com/vatsan95/Rephraser/releases" target="_blank" rel="noopener">release notes</a>
+        for your download — each one carries a VirusTotal scan link. If fewer
+        than 3 engines flag the file, it's almost certainly a false positive.
         File a GitHub issue and we'll submit for whitelisting.
     </p>
 

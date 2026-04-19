@@ -6,6 +6,7 @@ name: Windows Build (Phase 1 Tauri skeleton)
 on:
   push:
     branches: [main]
+    tags: ['win-v*']
     paths:
       - 'windows/app/**'
       - '.github/workflows/windows-build.yml'
@@ -16,7 +17,9 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  # `contents: write` is needed for the release-on-tag step further down.
+  # Read-only jobs (deny, PR builds) don't exercise it.
+  contents: write
 
 jobs:
   # cargo-deny runs on Linux because the official action ships as a Linux
@@ -121,8 +124,11 @@ jobs:
           if-no-files-found: warn
 
       # VirusTotal scan — non-blocking; only runs when VT_API_KEY is set.
-      # Fails soft so forks / PRs without the secret keep building.
-      - name: VirusTotal scan (NSIS)
+      # Fails soft so forks / PRs without the secret keep building. The
+      # `analysis` output is captured so downstream steps (release body +
+      # job summary) can link directly to each scan page.
+      - name: VirusTotal scan (MSI + NSIS)
+        id: vt
         if: ${{ success() && env.VT_API_KEY != '' }}
         continue-on-error: true
         env:
@@ -133,3 +139,70 @@ jobs:
           files: |
             windows/app/src-tauri/target/release/bundle/nsis/*.exe
             windows/app/src-tauri/target/release/bundle/msi/*.msi
+
+      # Surface VT URLs in the Actions job summary so maintainers can
+      # eyeball any red flags, and stash them as a step output for the
+      # release step to embed in the release notes.
+      - name: Report VirusTotal URLs
+        if: ${{ steps.vt.outputs.analysis != '' }}
+        id: vt_report
+        shell: pwsh
+        run: |
+          $raw = "${{ steps.vt.outputs.analysis }}"
+          "## VirusTotal scans" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          $lines = @()
+          foreach ($entry in $raw.Split(',')) {
+            $parts = $entry.Split('=', 2)
+            if ($parts.Length -eq 2) {
+              $name = Split-Path -Leaf $parts[0]
+              $url = $parts[1]
+              "- [$name]($url)" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+              $lines += "- [$name]($url)"
+            }
+          }
+          $md = ($lines -join "`n")
+          "markdown<<EOF`n$md`nEOF" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+
+      # ------- Release-on-tag (win-v*) -------
+      # Publishes MSI + NSIS as release assets and writes the VT scan URLs
+      # (captured above) into the release body. Matches the stable asset
+      # names that the website's /releases/latest/download/ links expect.
+      - name: Stage release assets with stable names
+        if: ${{ startsWith(github.ref, 'refs/tags/win-v') }}
+        shell: pwsh
+        working-directory: windows/app
+        run: |
+          New-Item -ItemType Directory -Force -Path release-assets | Out-Null
+          $msi = Get-ChildItem -Path "src-tauri/target/release/bundle/msi" -Filter "*.msi" | Select-Object -First 1
+          $nsis = Get-ChildItem -Path "src-tauri/target/release/bundle/nsis" -Filter "*.exe" | Select-Object -First 1
+          if ($msi) { Copy-Item $msi.FullName "release-assets/Rephraser-setup.msi" }
+          if ($nsis) { Copy-Item $nsis.FullName "release-assets/Rephraser-setup.exe" }
+
+      - name: Publish GitHub Release
+        if: ${{ startsWith(github.ref, 'refs/tags/win-v') }}
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            windows/app/release-assets/Rephraser-setup.exe
+            windows/app/release-assets/Rephraser-setup.msi
+          name: Rephraser for Windows ${{ github.ref_name }}
+          draft: false
+          prerelease: ${{ contains(github.ref_name, '-rc') || contains(github.ref_name, '-beta') || contains(github.ref_name, '-alpha') }}
+          body: |
+            Rephraser for Windows — ${{ github.ref_name }}
+
+            **Downloads**
+            - `Rephraser-setup.exe` — NSIS installer, recommended
+            - `Rephraser-setup.msi` — MSI installer, for enterprise `/quiet` deployment
+
+            **Security & transparency**
+            Every Windows build is scanned by VirusTotal in CI. Scan pages for
+            the files in this release:
+
+            ${{ steps.vt_report.outputs.markdown || '_VT scan was skipped for this build (VT_API_KEY not set)._' }}
+
+            If fewer than 3 engines flag the file it's almost certainly a
+            heuristic false positive — Rust binaries that call `SendInput`
+            and read the clipboard are a known AV trigger. See the
+            [install guide](https://vatsan95.github.io/Rephraser/windows.html)
+            for the SmartScreen walkthrough.
