@@ -13,7 +13,7 @@
     <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:title" content="Rephraser — Free AI Text Rewriter for Mac and Windows">
-    <meta property="og:description" content="Rephrase text in any Mac app with one shortcut. 100% on-device AI — no cloud, no API keys, no cost. 9 writing modes, diff view, works offline.">
+    <meta property="og:description" content="Rephrase text in any Mac or Windows app with one shortcut. 100% on-device AI — no cloud, no API keys, no cost. 9 writing modes, diff view, works offline.">
     <meta property="og:url" content="https://vatsan95.github.io/Rephraser/">
     <meta property="og:site_name" content="Rephraser">
     <meta property="og:image" content="https://vatsan95.github.io/Rephraser/og-image.png">
@@ -23,7 +23,7 @@
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Rephraser — Free AI Text Rewriter for Mac and Windows">
-    <meta name="twitter:description" content="Rephrase text in any Mac app with one shortcut. 100% on-device AI — no cloud, no API keys, no cost. 9 writing modes, diff view, works offline.">
+    <meta name="twitter:description" content="Rephrase text in any Mac or Windows app with one shortcut. 100% on-device AI — no cloud, no API keys, no cost. 9 writing modes, diff view, works offline.">
     <meta name="twitter:image" content="https://vatsan95.github.io/Rephraser/og-image.png">
 
     <!-- Favicon -->
@@ -36,7 +36,7 @@
         "@context": "https://schema.org",
         "@type": "SoftwareApplication",
         "name": "Rephraser",
-        "description": "Free on-device AI text rewriting app for macOS. Rephrase, rewrite, and fix grammar in any app with a keyboard shortcut. Runs locally on Apple Silicon.",
+        "description": "Free on-device AI text rewriting app for Mac and Windows. Rephrase, rewrite, and fix grammar in any app with a keyboard shortcut. Runs locally via Apple MLX on Mac or llama.cpp on Windows.",
         "applicationCategory": "UtilitiesApplication",
         "operatingSystem": "macOS 14+, Windows 10, Windows 11",
         "offers": {
@@ -45,9 +45,9 @@
             "priceCurrency": "USD"
         },
         "softwareVersion": "1.0.0",
-        "processorRequirements": "Apple Silicon (M1 or later)",
+        "processorRequirements": "Apple Silicon (M1 or later) on macOS, x64 on Windows",
         "url": "https://vatsan95.github.io/Rephraser/",
-        "downloadUrl": "https://github.com/vatsan95/Rephraser/releases/download/v1.0.0/Rephraser-Installer.dmg",
+        "downloadUrl": "https://github.com/vatsan95/Rephraser/releases/latest",
         "featureList": "On-device AI, 9 rephrase modes, context-aware tone, diff view, custom keyboard shortcut, works offline, clipboard preservation, multiple AI models"
     }
     </script>
@@ -71,7 +71,7 @@
                 "name": "Does Rephraser send my text to the cloud?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "No. Rephraser runs 100% on your Mac using Apple MLX. Your text never leaves your device — not even for a millisecond."
+                    "text": "No. Rephraser runs 100% on your device — Apple MLX on Mac, llama.cpp on Windows. Your text never leaves your device, not even for a millisecond."
                 }
             },
             {
@@ -92,10 +92,10 @@
             },
             {
                 "@type": "Question",
-                "name": "What Mac do I need to run Rephraser?",
+                "name": "What computer do I need to run Rephraser?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Rephraser requires macOS 14 (Sonoma) or later and an Apple Silicon chip (M1, M2, M3, M4 or later). It needs about 0.8 GB of disk space for the default AI model."
+                    "text": "On Mac: macOS 14 (Sonoma) or later with an Apple Silicon chip (M1, M2, M3, M4 or later). On Windows: Windows 10 version 1809 or later, or Windows 11, on x64 hardware with 4 GB RAM. About 0.8 GB of disk space for the default AI model on either OS."
                 }
             }
         ]
@@ -539,9 +539,9 @@
 
 <!-- Hero -->
 <header class="hero">
-    <div class="hero-privacy">Your text never leaves your Mac</div>
+    <div class="hero-privacy">Your text never leaves your device</div>
     <h1>Rewrite anything.<br><span class="d">Without switching apps.</span></h1>
-    <p>Select text anywhere on your Mac, press a shortcut, get a better version in seconds. AI runs entirely on your device — no cloud, no API keys, no accounts.</p>
+    <p>Select text anywhere on your Mac or Windows PC, press a shortcut, get a better version in seconds. AI runs entirely on your device — no cloud, no API keys, no accounts.</p>
     <div class="hero-cta">
         <a href="#" class="btn" onclick="openEmailGate(event)">
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
@@ -682,7 +682,7 @@
         <div class="feat-compact" style="margin-top: 40px;">
             <div class="feat-sm">
                 <h4>On-device AI</h4>
-                <p>Apple MLX. Your text never leaves your Mac.</p>
+                <p>Apple MLX on Mac, llama.cpp on Windows. Your text never leaves your device.</p>
             </div>
             <div class="feat-sm">
                 <h4>Context-aware</h4>
@@ -737,9 +737,9 @@
     <div class="s-inner fade-in">
         <div class="cmp-layout">
             <div class="cmp-text">
-                <h2>Rephraser vs Apple Intelligence</h2>
-                <p>Apple's Writing Tools give you 3 fixed tones, route complex requests through cloud servers, fail in WhatsApp and web editors, and are blocked in China.</p>
-                <p style="margin-top:16px;">Rephraser gives you 9 modes, custom prompts, model choice, context-aware suggestions, diff view, and works in every app. All on your device.</p>
+                <h2>Rephraser vs Apple Intelligence &amp; Copilot</h2>
+                <p>Apple's Writing Tools give you 3 fixed tones, route complex requests through cloud servers, fail in WhatsApp and web editors, and are blocked in China. Microsoft Copilot, Grammarly and Wordtune all run in the cloud and gate features behind paid plans.</p>
+                <p style="margin-top:16px;">Rephraser gives you 9 modes, custom prompts, model choice, context-aware suggestions, diff view, and works in every app. All on your device — free on Mac and Windows.</p>
             </div>
             <div class="tbl">
                 <div class="tr th"><span></span><span style="text-align:center">Rephraser</span><span style="text-align:center">Apple AI</span></div>
@@ -825,19 +825,19 @@
             </details>
             <details class="faq">
                 <summary>Does Rephraser send my text to the cloud?</summary>
-                <p>Never. Rephraser runs 100% on your device using Apple MLX. Your text never leaves your Mac — not even for analytics or telemetry.</p>
+                <p>Never. Rephraser runs 100% on your device — Apple MLX on Mac, llama.cpp on Windows. Your text never leaves your computer, not even for analytics or telemetry.</p>
             </details>
             <details class="faq">
-                <summary>How is this different from Apple Intelligence?</summary>
-                <p>Apple's Writing Tools offer 3 fixed tones, fail in many apps like WhatsApp, route complex requests to the cloud, and are blocked in some countries. Rephraser offers 9 modes plus custom ones, works in every app, stays fully on-device, includes a diff view, and is available worldwide.</p>
+                <summary>How is this different from Apple Intelligence, Copilot or Grammarly?</summary>
+                <p>Apple's Writing Tools offer 3 fixed tones, fail in apps like WhatsApp, route complex requests to the cloud, and are blocked in some countries. Microsoft Copilot, Grammarly and Wordtune all run in the cloud and paywall the good features. Rephraser offers 9 modes plus custom ones, works in every app, stays fully on-device, includes a diff view, and is free worldwide.</p>
             </details>
             <details class="faq">
                 <summary>Does it work offline?</summary>
-                <p>Yes. After the initial model download (~0.8 GB), Rephraser works with zero internet. Airplanes, coffee shops, VPN tunnels — anywhere your Mac works.</p>
+                <p>Yes. After the initial model download (~0.8 GB), Rephraser works with zero internet. Airplanes, coffee shops, VPN tunnels — anywhere your computer works.</p>
             </details>
             <details class="faq">
-                <summary>What Mac do I need?</summary>
-                <p>macOS 14 (Sonoma) or later with Apple Silicon (M1, M2, M3, M4 or later). About 0.8 GB of free disk space for the default AI model.</p>
+                <summary>What computer do I need?</summary>
+                <p><strong>Mac:</strong> macOS 14 (Sonoma) or later with Apple Silicon (M1, M2, M3, M4 or later).<br><strong>Windows:</strong> Windows 10 version 1809 or later, or Windows 11, on x64 hardware with 4 GB RAM. See the <a href="windows.html">Windows install guide</a>.<br>About 0.8 GB of free disk space for the default AI model either way.</p>
             </details>
             <details class="faq">
                 <summary>Can I use my own writing style or custom prompts?</summary>
@@ -879,7 +879,7 @@
 
 <footer>
     <div style="margin-bottom:12px;">
-        <a href="https://www.producthunt.com/products/rephraser/reviews/new?utm_source=badge-product_review&utm_medium=badge&utm_source=badge-rephraser" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/product_review.svg?product_id=1204398&theme=dark" alt="Rephraser - Rewrite text in any Mac app. 100% on-device AI. Free. | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
+        <a href="https://www.producthunt.com/products/rephraser/reviews/new?utm_source=badge-product_review&utm_medium=badge&utm_source=badge-rephraser" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/product_review.svg?product_id=1204398&theme=dark" alt="Rephraser - Rewrite text in any Mac or Windows app. 100% on-device AI. Free. | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
     </div>
     <span>&copy; 2026 Rephraser · Mac &amp; Windows</span>
     <div class="f-links">
