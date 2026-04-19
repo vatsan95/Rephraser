@@ -457,6 +457,94 @@
 
             footer { padding: 20px 16px; flex-direction: column; gap: 12px; }
         }
+        /* ---- Launch banner (Windows) ---- */
+        .launch-banner {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 110;
+            background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%);
+            color: #fff; text-align: center; font-size: 13px; font-weight: 600;
+            padding: 9px 48px 9px 20px; letter-spacing: 0.01em;
+            display: none;
+        }
+        .launch-banner.show { display: block; }
+        .launch-banner a { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
+        .launch-banner .close-banner {
+            position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+            background: none; border: none; color: rgba(255,255,255,0.85); font-size: 16px;
+            cursor: pointer; padding: 4px 8px; line-height: 1;
+        }
+        body.banner-on nav { top: 36px; }
+        body.banner-on .hero { padding-top: 196px; }
+        @media (max-width: 520px) {
+            .launch-banner { font-size: 11px; padding: 8px 36px 8px 12px; }
+            body.banner-on nav { top: 32px; }
+            body.banner-on .hero { padding-top: 140px; }
+        }
+
+        /* ---- OS pill toggle (hero) ---- */
+        .os-pills {
+            display: inline-flex; gap: 0; margin-top: 20px;
+            border: 1px solid #2a2a2e; border-radius: 999px; padding: 3px; background: #0f0f10;
+        }
+        .os-pill {
+            font-size: 12px; font-weight: 600; padding: 6px 16px; border-radius: 999px;
+            color: var(--dim); cursor: pointer; transition: all 0.15s; border: none; background: none;
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+        .os-pill.active { background: var(--text); color: var(--bg); }
+        .os-pill svg { width: 12px; height: 12px; }
+
+        /* ---- Windows launch section ---- */
+        .win-section {
+            background: linear-gradient(180deg, rgba(59,130,246,0.04) 0%, transparent 100%);
+        }
+        .win-hero {
+            display: grid; grid-template-columns: 1.1fr 1fr; gap: 56px; align-items: center;
+        }
+        .win-hero .win-badge {
+            display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+            text-transform: uppercase; color: #3b82f6; padding: 4px 10px;
+            border: 1px solid rgba(59,130,246,0.3); border-radius: 999px;
+            background: rgba(59,130,246,0.06);
+        }
+        .win-hero h2 {
+            font-size: 36px; font-weight: 800; letter-spacing: -1.5px; line-height: 1.1;
+            margin-top: 16px;
+        }
+        .win-hero p { font-size: 15px; color: var(--dim); line-height: 1.7; margin-top: 14px; }
+        .win-specs {
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px;
+            background: var(--border); border-radius: 12px; overflow: hidden; margin-top: 24px;
+        }
+        .win-spec { background: var(--surface); padding: 16px 18px; }
+        .win-spec .k { font-size: 11px; color: var(--faint); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 4px; }
+        .win-spec .v { font-size: 14px; font-weight: 600; color: var(--text); }
+        .win-cta-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 28px; }
+        .win-cta-row .btn { font-size: 14px; padding: 11px 22px; }
+        .win-cta-row a.secondary {
+            font-size: 14px; font-weight: 600; padding: 11px 22px; border-radius: 10px;
+            border: 1px solid #2a2a2e; color: var(--text);
+        }
+        .win-cta-row a.secondary:hover { border-color: #3a3a3e; background: rgba(255,255,255,0.02); }
+        .win-visual {
+            border: 1px solid #2a2a2e; border-radius: 16px; padding: 28px;
+            background: linear-gradient(145deg, #0f0f10 0%, #141416 100%);
+        }
+        .win-visual h4 { font-size: 13px; color: var(--dim); font-weight: 600; margin-bottom: 12px; letter-spacing: 0.03em; }
+        .win-apps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .win-app {
+            background: #161618; border: 1px solid #27272a; border-radius: 8px;
+            padding: 12px 10px; text-align: center; font-size: 12px; color: var(--text); font-weight: 500;
+        }
+        @media (max-width: 900px) {
+            .win-hero { grid-template-columns: 1fr; gap: 32px; }
+            .win-hero h2 { font-size: 28px; }
+        }
+        @media (max-width: 520px) {
+            .win-specs { grid-template-columns: 1fr; }
+            .win-hero h2 { font-size: 24px; }
+            .win-visual { padding: 20px; }
+        }
+
         /* Donate button */
         .donate-btn {
             display: inline-flex; align-items: center; gap: 8px;
@@ -512,6 +600,12 @@
 </head>
 <body>
 
+<div class="launch-banner" id="launchBanner">
+    <span>&#127881; Rephraser is now on <strong>Windows 10 and 11</strong> — same app, same shortcut, on your PC.
+    <a href="windows.html" onclick="trackEvent('banner-windows-guide-click')">See what's new →</a></span>
+    <button class="close-banner" aria-label="Dismiss" onclick="dismissBanner()">&times;</button>
+</div>
+
 <nav>
     <div class="nav-c">
         <a href="#" class="wordmark">
@@ -531,6 +625,7 @@
             <a href="#showcase">Preview</a>
             <a href="#features">Features</a>
             <a href="#compare">vs Apple AI</a>
+            <a href="#windows">Windows</a>
             <a href="https://github.com/vatsan95/Rephraser" class="star-btn">&#9733; Star on GitHub</a>
             <a href="#" class="nav-btn" onclick="openEmailGate(event)">Download</a>
         </div>
@@ -541,7 +636,7 @@
 <header class="hero">
     <div class="hero-privacy">Your text never leaves your device</div>
     <h1>Rewrite anything.<br><span class="d">Without switching apps.</span></h1>
-    <p>Select text anywhere on your Mac or Windows PC, press a shortcut, get a better version in seconds. AI runs entirely on your device — no cloud, no API keys, no accounts.</p>
+    <p>Select text anywhere on your Mac or Windows PC, press a shortcut, get a better version in seconds. Powered by Apple MLX on Mac and llama.cpp on Windows — 100% on-device. No cloud. No API keys. No accounts.</p>
     <div class="hero-cta">
         <a href="#" class="btn" onclick="openEmailGate(event)">
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
@@ -549,12 +644,20 @@
         </a>
         <a href="https://github.com/vatsan95/Rephraser" class="hero-star">&#9733; Star on GitHub</a>
         <span class="hero-meta" id="heroMeta">macOS 14+ · Apple Silicon · Free</span>
-        <div class="os-toggle" style="width:100%;text-align:center;margin-top:10px;font-size:12px;color:var(--faint);">
-            <a href="#" id="osToggleMac" onclick="setOS('mac');return false;" style="color:inherit;margin:0 6px;">Mac</a>
-            ·
-            <a href="#" id="osToggleWin" onclick="setOS('windows');return false;" style="color:inherit;margin:0 6px;">Windows</a>
-            <span style="margin:0 6px;color:var(--faint);">·</span>
-            <a href="windows.html" style="color:inherit;">Windows install guide →</a>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:4px;">
+        <div class="os-pills" role="tablist" aria-label="Choose platform">
+            <button type="button" role="tab" class="os-pill" id="osPillMac" onclick="setOS('mac', true)">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+                Mac
+            </button>
+            <button type="button" role="tab" class="os-pill" id="osPillWin" onclick="setOS('windows', true)">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 5.479L10.5 4.45v7.05H3V5.479zM3 18.521l7.5 1.029V12.5H3v6.021zM11.5 19.688L21 21V12.5h-9.5v7.188zM11.5 4.313V11.5H21V3l-9.5 1.313z"/></svg>
+                Windows
+            </button>
+        </div>
+        <div style="font-size:12px;color:var(--faint);">
+            <a href="windows.html" onclick="trackEvent('hero-windows-guide-click')" style="color:inherit;">Windows install guide →</a>
         </div>
     </div>
     <div class="install-toast" id="installToast">
@@ -578,15 +681,17 @@
         </div>
     </div>
     <div class="hero-apps">
+        <span class="ha">Outlook</span>
+        <span class="ha">Teams</span>
+        <span class="ha">Word</span>
         <span class="ha">Slack</span>
         <span class="ha">Gmail</span>
         <span class="ha">Notion</span>
         <span class="ha">VS Code</span>
         <span class="ha">Discord</span>
+        <span class="ha">Edge</span>
         <span class="ha">Chrome</span>
         <span class="ha">Safari</span>
-        <span class="ha">Pages</span>
-        <span class="ha">Notes</span>
         <span class="ha">Any app</span>
     </div>
 
@@ -673,6 +778,53 @@
     <button class="lightbox-arrow lightbox-next" onclick="lightboxNav(1)">&#8250;</button>
     <div class="lightbox-counter" id="lightboxCounter"></div>
 </div>
+
+<!-- Windows launch spotlight -->
+<section class="s win-section" id="windows" aria-label="Rephraser on Windows">
+    <div class="s-inner fade-in">
+        <div class="win-hero">
+            <div>
+                <span class="win-badge">New · Windows 10 &amp; 11</span>
+                <h2>Finally, a private AI rewriter for Windows.</h2>
+                <p>Copilot wants a Microsoft 365 subscription. Grammarly ships your text to the cloud. Wordtune paywalls the good stuff. Rephraser does none of that — it's the <strong>only</strong> AI text rewriter on Windows that's free, open-source, fully offline, and works in every app.</p>
+                <p style="margin-top:12px;">Same 9 modes, same 5 models, same shortcut — now on your PC. Runs on CPU alone, so it works on a 2016 ThinkPad or a Copilot+ Surface.</p>
+                <div class="win-specs">
+                    <div class="win-spec"><div class="k">Installer size</div><div class="v">~13 MB</div></div>
+                    <div class="win-spec"><div class="k">Runtime</div><div class="v">llama.cpp · CPU-only</div></div>
+                    <div class="win-spec"><div class="k">Requirements</div><div class="v">Win 10 1809+ / Win 11 · x64 · 4 GB RAM</div></div>
+                    <div class="win-spec"><div class="k">Cost</div><div class="v">$0 forever</div></div>
+                </div>
+                <div class="win-cta-row">
+                    <a href="#" class="btn" onclick="setOS('windows', true); openEmailGate(event)">
+                        <svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px;"><path d="M3 5.479L10.5 4.45v7.05H3V5.479zM3 18.521l7.5 1.029V12.5H3v6.021zM11.5 19.688L21 21V12.5h-9.5v7.188zM11.5 4.313V11.5H21V3l-9.5 1.313z"/></svg>
+                        Download for Windows
+                    </a>
+                    <a href="windows.html" class="secondary" onclick="trackEvent('win-section-guide-click')">Install guide &amp; VirusTotal scan →</a>
+                </div>
+            </div>
+            <div class="win-visual">
+                <h4>Works in the apps you already live in</h4>
+                <div class="win-apps">
+                    <div class="win-app">Outlook</div>
+                    <div class="win-app">Teams</div>
+                    <div class="win-app">Word</div>
+                    <div class="win-app">Slack</div>
+                    <div class="win-app">Edge</div>
+                    <div class="win-app">Chrome</div>
+                    <div class="win-app">Discord</div>
+                    <div class="win-app">VS Code</div>
+                    <div class="win-app">Notion</div>
+                    <div class="win-app">Gmail</div>
+                    <div class="win-app">LinkedIn</div>
+                    <div class="win-app">Any app</div>
+                </div>
+                <div style="margin-top:20px;padding-top:18px;border-top:1px solid #27272a;font-size:12px;color:var(--dim);line-height:1.6;">
+                    <strong style="color:var(--text);">Ctrl + Alt + R</strong> anywhere on Windows. Same private inference engine the Mac version uses. Nothing leaves your PC.
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
 <!-- Features -->
 <section class="s" id="features" aria-label="Features">
@@ -806,7 +958,7 @@
 <!-- CTA -->
 <section class="bottom-cta fade-in" aria-label="Download">
     <h2>Stop copy-pasting<br><span class="d">into ChatGPT.</span></h2>
-    <p>One shortcut. Nine modes. Fully private. Runs on your Mac.</p>
+    <p id="ctaSubcopy">One shortcut. Nine modes. Fully private. Runs on your computer — Mac or Windows.</p>
     <a href="#" class="btn" onclick="openEmailGate(event)">
         <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
         <span id="ctaBtnLabel">Download for Mac</span>
@@ -898,6 +1050,14 @@
     const MAC_URL = 'https://github.com/vatsan95/Rephraser/releases/latest/download/Rephraser-Installer.dmg';
     const WIN_URL = 'https://github.com/vatsan95/Rephraser/releases/latest/download/Rephraser-setup.exe';
     let CURRENT_OS = 'mac';
+    let DETECTED_OS = 'mac';
+
+    // GoatCounter event helper — hoisted so detection + toggle can call it.
+    function trackEvent(name) {
+        if (window.goatcounter && window.goatcounter.count) {
+            window.goatcounter.count({ path: name, title: name, event: true });
+        }
+    }
 
     function detectOS() {
         // Prefer the modern client-hints API, fall back to UA string.
@@ -905,12 +1065,16 @@
         const ua = navigator.userAgent || '';
         if (/Win/i.test(platform) || /Windows/i.test(ua)) return 'windows';
         if (/Mac/i.test(platform) || /Macintosh/i.test(ua)) return 'mac';
-        return 'mac'; // Linux / Android / iOS / unknown → show Mac by default; manual toggle available
+        if (/Linux/i.test(platform) || /Linux/i.test(ua)) return 'linux';
+        if (/Android|iPhone|iPad|iPod/i.test(ua)) return 'mobile';
+        return 'other';
     }
 
-    function setOS(os) {
-        CURRENT_OS = os;
-        const isWin = os === 'windows';
+    function setOS(os, userInitiated) {
+        // Normalise unsupported buckets to Mac UI (manual toggle stays available).
+        const displayOs = (os === 'mac' || os === 'windows') ? os : 'mac';
+        CURRENT_OS = displayOs;
+        const isWin = displayOs === 'windows';
         const heroLabel = document.getElementById('heroBtnLabel');
         const ctaLabel = document.getElementById('ctaBtnLabel');
         const heroMeta = document.getElementById('heroMeta');
@@ -923,14 +1087,39 @@
         if (ctaMeta) ctaMeta.textContent = isWin
             ? 'Windows 10 / 11 · x64 · Free · ~0.8 GB for default AI model'
             : 'macOS 14 (Sonoma) · Apple Silicon (M1+) · ~0.8 GB for default AI model';
-        const mac = document.getElementById('osToggleMac');
-        const win = document.getElementById('osToggleWin');
-        if (mac) mac.style.fontWeight = isWin ? '400' : '700';
-        if (win) win.style.fontWeight = isWin ? '700' : '400';
+        const macPill = document.getElementById('osPillMac');
+        const winPill = document.getElementById('osPillWin');
+        if (macPill) macPill.classList.toggle('active', !isWin);
+        if (winPill) winPill.classList.toggle('active', isWin);
+        if (userInitiated) {
+            trackEvent('os-toggle-' + displayOs);
+        }
     }
 
-    // Run OS detection as early as possible so buttons show the right label.
-    setOS(detectOS());
+    // Detect OS, record which bucket the visitor fell into, then apply.
+    DETECTED_OS = detectOS();
+    trackEvent('os-detected-' + DETECTED_OS);
+    setOS(DETECTED_OS, false);
+
+    // ---- Launch banner (Windows) ----
+    // Show the "Now on Windows" banner to every visitor (great for PR/launch
+    // discoverability). Dismiss persists in localStorage so it doesn't nag.
+    function dismissBanner() {
+        document.getElementById('launchBanner').classList.remove('show');
+        document.body.classList.remove('banner-on');
+        try { localStorage.setItem('winLaunchBannerDismissed', '1'); } catch (e) {}
+        trackEvent('banner-dismiss');
+    }
+    (function initBanner() {
+        try {
+            if (localStorage.getItem('winLaunchBannerDismissed') === '1') return;
+        } catch (e) {}
+        const b = document.getElementById('launchBanner');
+        if (!b) return;
+        b.classList.add('show');
+        document.body.classList.add('banner-on');
+        trackEvent('banner-impression');
+    })();
 
     // Scroll fade-in
     const observer = new IntersectionObserver((entries) => {
@@ -969,20 +1158,47 @@
     });
 
     // Email gate
-    // GoatCounter event helper
-    function trackEvent(name) {
-        if (window.goatcounter && window.goatcounter.count) {
-            window.goatcounter.count({ path: name, title: name, event: true });
-        }
-    }
-
     function openEmailGate(e) {
-        e.preventDefault();
+        if (e && e.preventDefault) e.preventDefault();
         trackEvent('download-click');
         trackEvent('download-click-' + CURRENT_OS);
+        trackEvent('download-click-detected-' + DETECTED_OS);
         document.getElementById('emailOverlay').classList.add('show');
         setTimeout(() => document.getElementById('emailInput').focus(), 200);
     }
+
+    // ---- Extra telemetry ----
+    // Match the Mac TelemetryDeck event surface: downloads split by OS,
+    // plus meaningful page interactions (donate, star, PH, FAQ, guide).
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('a[href*="paypal.me"]').forEach(a => {
+            a.addEventListener('click', () => trackEvent('paypal-donate-click'));
+        });
+        document.querySelectorAll('a[href*="github.com/vatsan95/Rephraser"]').forEach(a => {
+            const href = a.getAttribute('href') || '';
+            if (href.endsWith('/Rephraser') || href.endsWith('/Rephraser/')) {
+                a.addEventListener('click', () => trackEvent('github-star-click'));
+            } else if (href.includes('/releases')) {
+                a.addEventListener('click', () => trackEvent('releases-page-click'));
+            } else if (href.includes('/issues')) {
+                a.addEventListener('click', () => trackEvent('feedback-click'));
+            }
+        });
+        document.querySelectorAll('a[href*="producthunt.com"]').forEach(a => {
+            a.addEventListener('click', () => trackEvent('producthunt-click'));
+        });
+        document.querySelectorAll('a[href="windows.html"]').forEach(a => {
+            a.addEventListener('click', () => trackEvent('windows-guide-click'));
+        });
+        document.querySelectorAll('a[href="privacy.html"]').forEach(a => {
+            a.addEventListener('click', () => trackEvent('privacy-page-click'));
+        });
+        document.querySelectorAll('details.faq').forEach((d, i) => {
+            d.addEventListener('toggle', () => {
+                if (d.open) trackEvent('faq-open-' + (i + 1));
+            });
+        });
+    });
     function closeEmailGate() {
         document.getElementById('emailOverlay').classList.remove('show');
         document.getElementById('emailErr').textContent = '';
@@ -1013,22 +1229,39 @@
         btn.disabled = true;
         btn.textContent = 'Sending...';
 
-        // Submit to Google Sheets (tracking) + FormSubmit (email notification)
+        // Submit to Google Sheets (tracking) + FormSubmit (email notification).
+        // Payload carries both the chosen OS (what they're downloading) and
+        // the detected OS (what they're browsing on) so we can separate
+        // visitors who downloaded the "other" platform from their PC.
         const downloadUrl = CURRENT_OS === 'windows' ? WIN_URL : MAC_URL;
+        const payload = {
+            email: email,
+            os: CURRENT_OS,
+            detected_os: DETECTED_OS,
+            referrer: document.referrer || 'direct',
+            user_agent: navigator.userAgent || '',
+        };
         Promise.all([
             fetch('https://script.google.com/macros/s/AKfycby9eemA9YDa37xwSiqly0sbb6eoNhMbtYk841syI8qLPl9DGXLHHSqomjTnAGuRew4xFQ/exec', {
                 method: 'POST',
-                body: JSON.stringify({ email: email, os: CURRENT_OS })
+                body: JSON.stringify(payload)
             }),
             fetch('https://formsubmit.co/ajax/7e114eb208eff7d2c682a8007dbb7034d27bc7bc36165d6510fcf1a303c3819b', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                body: JSON.stringify({ email: email, os: CURRENT_OS, _subject: 'New Rephraser Download (' + CURRENT_OS + ')', _template: 'table' })
+                body: JSON.stringify(Object.assign({}, payload, {
+                    _subject: 'New Rephraser Download (' + CURRENT_OS + ' · detected ' + DETECTED_OS + ')',
+                    _template: 'table'
+                }))
             })
         ]).then(([sheetRes]) => {
-            // Trigger download regardless — sheet is the source of truth
+            // Trigger download regardless — sheet is the source of truth.
             trackEvent('download-started');
             trackEvent('download-started-' + CURRENT_OS);
+            trackEvent('download-started-detected-' + DETECTED_OS);
+            if (CURRENT_OS !== DETECTED_OS && (DETECTED_OS === 'mac' || DETECTED_OS === 'windows')) {
+                trackEvent('download-cross-os-' + DETECTED_OS + '-to-' + CURRENT_OS);
+            }
             closeEmailGate();
             window.open(downloadUrl, '_blank');
             // Swap the toast body to match the OS the user actually downloaded for.
