@@ -13,7 +13,7 @@ mod settings;
 use tauri::{
     menu::{Menu, MenuItem},
     tray::TrayIconBuilder,
-    Listener, Manager,
+    Emitter, Listener, Manager,
 };
 
 #[tauri::command]
@@ -146,12 +146,22 @@ async fn panel_dismiss(
     app: tauri::AppHandle,
     previous_clipboard: Option<String>,
 ) -> Result<(), String> {
+    // E11 — if inference is still running, stop it before we restore the
+    // clipboard so we don't paste a partial result into the original app.
+    inference::cancel();
     if let Some(p) = previous_clipboard {
         let _ = clipboard::restore(&p);
     }
     analytics::emit(&app, "rephraseRejected", serde_json::json!({}));
     panel::close_panel(&app);
     Ok(())
+}
+
+/// Phase 4: frontend-fired cancel (e.g. mode-switch mid-stream) — stops
+/// the current generation without closing the panel or touching clipboard.
+#[tauri::command]
+fn cancel_rephrase() {
+    inference::cancel();
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -235,6 +245,7 @@ pub fn run() {
             load_model,
             is_model_loaded,
             rephrase,
+            cancel_rephrase,
             panel_accept,
             panel_dismiss,
             list_catalog,
@@ -260,6 +271,15 @@ async fn handle_hotkey(app: tauri::AppHandle) {
             return;
         }
     };
+
+    // A18 — clipboard didn't change during the Ctrl+C poll, which almost
+    // always means nothing was selected. Surface that to the user instead
+    // of opening an empty panel.
+    if captured.trim().is_empty() {
+        let _ = app.emit("hotkey://no-selection", ());
+        tracing::info!("hotkey pressed with no selection; skipping panel");
+        return;
+    }
     let process = context::foreground_process_name().unwrap_or_default();
     let suggested_mode = context::mode_for_process(&process).to_string();
 

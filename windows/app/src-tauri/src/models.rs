@@ -5,13 +5,17 @@
 //!   - Report installed models under `%LOCALAPPDATA%\Rephraser\models\`
 //!   - Stream-download a GGUF from HuggingFace via `reqwest`, emitting
 //!     `download://progress` events with {id, downloaded, total, pct}
+//!   - Resumable downloads (plan A7): if a `.part` exists we send a
+//!     `Range: bytes=<existing>-` header and append instead of restart
 //!   - Atomic write via `.part` temp → rename on success
-//!   - Disk-space precheck (Plan A10/E10): abort if free < 2× model size
+//!   - Disk-space precheck (plan A10/E10): abort if free < 2× model size
+//!   - RAM precheck (plan A11): warn if total RAM < minRamGB for the model
 //!   - Delete a model on request
 //!
 //! SHA verification is deferred: bartowski doesn't publish canonical
 //! hashes per release, so for v0.1 we trust HuggingFace TLS + CDN
-//! integrity. E14 (supply chain) will revisit.
+//! integrity. E14 (supply chain) will revisit once the catalog carries
+//! per-file digests.
 
 use anyhow::{anyhow, Context, Result};
 use futures_util::StreamExt;
@@ -167,6 +171,24 @@ fn fs2_available_space(_path: &Path) -> Option<u64> {
     None
 }
 
+/// Total physical RAM in bytes (plan A11). `None` on non-Windows or if the
+/// syscall fails — callers treat that as "skip the check".
+#[cfg(windows)]
+fn total_ram_bytes() -> Option<u64> {
+    use windows::Win32::System::SystemInformation::{GlobalMemoryStatusEx, MEMORYSTATUSEX};
+    let mut status: MEMORYSTATUSEX = unsafe { std::mem::zeroed() };
+    status.dwLength = std::mem::size_of::<MEMORYSTATUSEX>() as u32;
+    unsafe {
+        GlobalMemoryStatusEx(&mut status).ok()?;
+    }
+    Some(status.ullTotalPhys)
+}
+
+#[cfg(not(windows))]
+fn total_ram_bytes() -> Option<u64> {
+    None
+}
+
 pub async fn download(app: AppHandle, id: String) -> Result<PathBuf> {
     let entry = catalog()
         .models
@@ -183,28 +205,76 @@ pub async fn download(app: AppHandle, id: String) -> Result<PathBuf> {
     let min_bytes = entry.approx_size_mb * 1024 * 1024 * 2;
     precheck_disk(&target, min_bytes)?;
 
+    // A11 — warn (via log + event) if total physical RAM is below the
+    // model's minRamGB. We don't hard-block: users may have swap, or the
+    // catalog value may be conservative. The frontend can surface the
+    // `download://low-ram` event as a non-blocking toast.
+    if let Some(total_ram) = total_ram_bytes() {
+        let need = entry.min_ram_gb.saturating_mul(1024 * 1024 * 1024);
+        if total_ram < need {
+            tracing::warn!(
+                "low RAM for {}: have {} MB, model wants {} GB",
+                entry.id,
+                total_ram / 1_048_576,
+                entry.min_ram_gb
+            );
+            let _ = app.emit(
+                "download://low-ram",
+                serde_json::json!({
+                    "id": entry.id,
+                    "totalRamMB": total_ram / 1_048_576,
+                    "minRamGB": entry.min_ram_gb,
+                }),
+            );
+        }
+    }
+
+    // A7 — resumable download. If a `.part` file already exists, append
+    // to it and ask HF for the rest via `Range:`. Otherwise start fresh.
+    let tmp = target.with_extension("part");
+    let existing: u64 = tokio::fs::metadata(&tmp)
+        .await
+        .map(|m| m.len())
+        .unwrap_or(0);
+
     let url = hf_resolve_url(&entry.repo, &entry.filename);
     let client = reqwest::Client::builder()
         .user_agent("Rephraser-Windows/0.1")
         .build()
         .context("build reqwest client")?;
 
-    let resp = client
-        .get(&url)
+    let mut req = client.get(&url);
+    if existing > 0 {
+        req = req.header("Range", format!("bytes={}-", existing));
+        tracing::info!("resuming {} from byte {}", entry.id, existing);
+    }
+
+    let resp = req
         .send()
         .await
         .context("GET model file")?
         .error_for_status()
         .with_context(|| format!("bad HTTP status from {url}"))?;
 
-    let total = resp.content_length().unwrap_or(0);
-    let tmp = target.with_extension("part");
-    let mut file = tokio::fs::File::create(&tmp)
-        .await
-        .context("create .part file")?;
+    // If server ignored Range (200 instead of 206), restart from zero.
+    let resuming = existing > 0 && resp.status().as_u16() == 206;
+    let mut downloaded: u64 = if resuming { existing } else { 0 };
+    let body_len = resp.content_length().unwrap_or(0);
+    let total = if resuming { existing + body_len } else { body_len };
+
+    let mut file = if resuming {
+        tokio::fs::OpenOptions::new()
+            .append(true)
+            .open(&tmp)
+            .await
+            .context("open .part for append")?
+    } else {
+        tokio::fs::File::create(&tmp)
+            .await
+            .context("create .part file")?
+    };
 
     let mut stream = resp.bytes_stream();
-    let mut downloaded: u64 = 0;
     let mut last_pct: i32 = -1;
 
     while let Some(chunk) = stream.next().await {

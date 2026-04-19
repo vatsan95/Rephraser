@@ -26,9 +26,32 @@ use llama_cpp_2::{
 };
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
-use std::{num::NonZeroU32, path::PathBuf, sync::Arc};
+use std::{
+    num::NonZeroU32,
+    path::PathBuf,
+    sync::{
+        atomic::{AtomicBool, Ordering},
+        Arc,
+    },
+};
 use tauri::{AppHandle, Emitter};
 use tokio::sync::Mutex;
+
+/// Phase 4 E11 — user pressed Escape mid-stream. Flipped by `cancel()`,
+/// checked every token inside the generation loop. Reset on each new
+/// `rephrase()` call.
+static CANCEL: AtomicBool = AtomicBool::new(false);
+
+pub fn cancel() {
+    CANCEL.store(true, Ordering::SeqCst);
+}
+
+/// Plan A17 — hard cap on input length. We allocate ~1536 tokens of
+/// prompt headroom (system + user + ChatML tags) so the model keeps
+/// room for the 384-token output inside its 2048 ctx window. 6000 chars
+/// ≈ 1500 tokens for English; anything longer is rejected with a clear
+/// message rather than silently truncated.
+const MAX_INPUT_CHARS: usize = 6000;
 
 // ---------- Mode catalog (shared with Mac) ----------
 
@@ -123,6 +146,19 @@ pub async fn rephrase(app: AppHandle, text: String, mode_id: String) -> Result<(
         .ok_or_else(|| anyhow!("unknown mode: {mode_id}"))?
         .to_string();
 
+    // A17 — reject over-long input up front so the user gets a specific
+    // error instead of a confusing truncation or ctx-overflow failure.
+    if text.chars().count() > MAX_INPUT_CHARS {
+        return Err(anyhow!(
+            "Text is too long ({} chars). Select a smaller chunk (max {}).",
+            text.chars().count(),
+            MAX_INPUT_CHARS
+        ));
+    }
+
+    // E11 — clear any stale cancel flag from a previous run.
+    CANCEL.store(false, Ordering::SeqCst);
+
     let loaded_arc = LOADED.clone();
     let app_clone = app.clone();
 
@@ -170,6 +206,12 @@ pub async fn rephrase(app: AppHandle, text: String, mode_id: String) -> Result<(
         let mut n_decode: u32 = 0;
 
         while (n_decode as i32) < MAX_NEW_TOKENS {
+            // E11 — honour Escape from the frontend as promptly as possible.
+            // Checked every token, so worst-case latency is one decode step.
+            if CANCEL.load(Ordering::SeqCst) {
+                break;
+            }
+
             let new_token = sampler.sample(&ctx, batch.n_tokens() - 1);
             sampler.accept(new_token);
 
