@@ -119,3 +119,43 @@ Phase 7 on those purchases.
 - **Code signing:** Certum Open-Source cert (~$70/yr) — purchased when? target: after 100 downloads
 - **Microsoft Store:** MSIX submission — target v0.3
 - **ARM64 build:** target v0.2
+
+---
+
+## 2026-04-19 — Phase 7.5: hardening pass (audit remediation)
+
+**Context:** Product + engineering audit of phases 0–9 against the plan
+surfaced six concrete code gaps. Closed in commit `d81f0d9`.
+
+**Decision:**
+- **E1 (WebView2):** `tauri.conf.json` sets
+  `webviewInstallMode = downloadBootstrapper` so Windows 10 <1803 auto-
+  installs Edge WebView2 at setup. Adds ~2 MB to the installer; avoids a
+  whole class of "blank window" bug reports.
+- **E11 (cancel):** `inference.rs` checks a process-wide `AtomicBool`
+  every token; `panel_dismiss` and a new `cancel_rephrase` command flip
+  it. Escape mid-stream no longer lets a partial result clobber the
+  clipboard on the way out.
+- **A17 (long text):** reject > 6000 chars up front with a specific
+  error instead of silently truncating and producing a ctx-overflow.
+- **A18 (empty selection):** hotkey pressed with nothing selected now
+  emits `hotkey://no-selection` instead of opening an empty panel.
+- **A7 (resumable download):** `models.rs` sends `Range: bytes=<existing>-`
+  when a `.part` file is present; falls back to full restart if HF
+  responds 200 instead of 206. Big-model / flaky-wifi case no longer
+  starts from zero.
+- **A11 (RAM warn):** `GlobalMemoryStatusEx` (via the existing `windows`
+  crate, new feature `Win32_System_SystemInformation`) compares total
+  physical RAM against the catalog's `minRamGB`; emits
+  `download://low-ram` as a non-blocking signal. Not a hard block — swap
+  exists, and the catalog value is conservative.
+
+**Consequences:**
+- Zero new dependencies (reused the `windows` crate for RAM probe).
+- Frontend work queued for Phase 8: toast listeners for
+  `hotkey://no-selection` and `download://low-ram`, plus wiring
+  `cancel_rephrase` to Escape / mode-change mid-stream.
+- SHA-per-file model verification remains deferred (E14) — bartowski
+  doesn't publish canonical hashes per release; revisit when the catalog
+  carries digests.
+
