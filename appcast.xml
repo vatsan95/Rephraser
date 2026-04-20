@@ -6,6 +6,28 @@
         <description>Rephraser app updates</description>
         <language>en</language>
         <item>
+            <title>Rephraser 1.0.1</title>
+            <pubDate>Mon, 20 Apr 2026 00:00:00 +0000</pubDate>
+            <sparkle:version>2</sparkle:version>
+            <sparkle:shortVersionString>1.0.1</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[
+                <h2>Rephraser 1.0.1</h2>
+                <ul>
+                    <li>Better quality rewrites in every mode — especially for multi-sentence inputs with questions or emphasis</li>
+                    <li>Phi-4 Mini is now the recommended model for new installs. Existing users keep whichever model they've already downloaded</li>
+                    <li>Gemma 3 1B is still available as "Lite" for users who want the smallest download</li>
+                    <li>Prompt fixes apply to every model, so the quality improvements ship to everyone — not just users on the new default</li>
+                </ul>
+            ]]></description>
+            <enclosure
+                url="https://github.com/vatsan95/Rephraser/releases/download/v1.0.1/Rephraser-macOS.zip"
+                length="12582912"
+                type="application/octet-stream"
+                sparkle:edSignature=""
+            />
+        </item>
+        <item>
             <title>Rephraser 1.0.0</title>
             <pubDate>Mon, 14 Apr 2026 00:00:00 +0000</pubDate>
             <sparkle:version>1</sparkle:version>
