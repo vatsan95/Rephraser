@@ -37,11 +37,10 @@ Download any of these from within the app — no terminal needed:
 
 | Model | Size | Notes |
 |-------|------|-------|
-| **Gemma 3 1B** (recommended) | ~0.8 GB | Google's Gemma 3 — fast download, great for quick rephrasing |
-| Gemma 3 4B | ~2.5 GB | Google's Gemma 3 — best quality |
+| **Phi-4 Mini** (recommended) | ~2.3 GB | Microsoft Phi-4 Mini — best instruction-following across all 9 modes |
+| Llama 3.2 3B | ~1.8 GB | Meta — balanced size and quality |
+| Gemma 3 1B (Lite) | ~0.8 GB | Google Gemma 3 — smallest download, best for short single-sentence rephrases |
 | Qwen 3 4B | ~2.5 GB | Alibaba — strong multilingual support |
-| Phi-4 Mini | ~2.3 GB | Microsoft — compact and efficient |
-| Llama 3.2 3B | ~1.8 GB | Meta — smallest, fastest |
 
 The Mac build loads models in MLX-safetensors format; the Windows build loads the equivalent GGUF quant (Q4_K_M) from [bartowski on HuggingFace](https://huggingface.co/bartowski).
 
@@ -51,7 +50,7 @@ The Mac build loads models in MLX-safetensors format; the Windows build loads th
 - macOS 14 (Sonoma) or later
 - Apple Silicon (M1, M2, M3, M4, …)
 - ~2–3 GB RAM during inference (comfortable on 8 GB Macs)
-- ~0.8 GB free disk for the default model
+- ~2.3 GB free disk for the default model (Phi-4 Mini)
 
 **Windows**
 - Windows 10 version 1809 (October 2018 Update) or later, or Windows 11

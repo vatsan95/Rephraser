@@ -66,52 +66,69 @@ enum RephraseMode: Identifiable, Hashable, Codable {
             Rephrase the following text to sound professional and polished, suitable for workplace communication.
             Rules:
             - Keep the same meaning and intent
+            - Preserve every sentence and clause — if the input has 3 sentences, the output has 3 sentences. Do not merge, split, or drop sentences
+            - If the text contains a question, rephrase it as a question — do not answer it
+            - Preserve ALL CAPS words used for emphasis (e.g. "NO" stays "NO")
             - Maintain the same language as the input
             - Fix any grammar or spelling errors
             - Use a confident, respectful tone
             - Do not add information not present in the original
-            - Return ONLY the rephrased text with no explanation or preamble
+            - Do not include any introduction, preface, or meta-commentary. Do not reference "the text", "the input", "the message", or "the highlighted text". Your output must begin with the first word of the result itself
             """
         case .casual:
             return """
             Rephrase the following text to sound casual and friendly, like a message to a colleague you're comfortable with.
             Rules:
             - Keep the same meaning and intent
+            - Preserve every sentence and clause — if the input has 3 sentences, the output has 3 sentences. Do not merge, split, or drop sentences
+            - If the text contains a question, rephrase it as a question — do not answer it
+            - Preserve ALL CAPS words used for emphasis (e.g. "NO" stays "NO")
             - Maintain the same language as the input
             - Fix any grammar or spelling errors
             - Use a warm, approachable tone
             - Do not add information not present in the original
-            - Return ONLY the rephrased text with no explanation or preamble
+            - Do not include any introduction, preface, or meta-commentary. Do not reference "the text", "the input", "the message", or "the highlighted text". Your output must begin with the first word of the result itself
             """
         case .concise:
             return """
             Rephrase the following text to be as concise as possible while preserving the full meaning.
             Rules:
-            - Remove unnecessary words, filler, and redundancy
+            - Remove unnecessary words, filler, and redundancy within each sentence
+            - Preserve every sentence and idea — you may shorten each sentence, but do not drop entire sentences, clauses, or ideas
+            - If the text contains a question, rephrase it as a question — do not answer it
+            - Preserve ALL CAPS words used for emphasis (e.g. "NO" stays "NO")
             - Keep the same meaning, intent, and tone
             - Maintain the same language as the input
             - Fix any grammar or spelling errors
             - Do not remove important details or nuance
-            - Return ONLY the rephrased text with no explanation or preamble
+            - Do not include any introduction, preface, or meta-commentary. Do not reference "the text", "the input", "the message", or "the highlighted text". Your output must begin with the first word of the result itself
             """
         case .elaborate:
             return """
             Rephrase the following text with more detail and context, making it clearer and more comprehensive.
             Rules:
-            - Expand on the ideas naturally without adding false information
+            - Expand on the ideas within each sentence naturally without adding false information
+            - Preserve every sentence and clause — the output should have at least as many sentences as the input. Do not merge sentences together
+            - If the text contains a question, rephrase it as a question — do not answer it
+            - Preserve ALL CAPS words used for emphasis (e.g. "NO" stays "NO")
             - Keep the same meaning and intent
             - Maintain the same language as the input
             - Fix any grammar or spelling errors
             - Use smooth transitions between ideas
-            - Return ONLY the rephrased text with no explanation or preamble
+            - Do not include any introduction, preface, or meta-commentary. Do not reference "the text", "the input", "the message", or "the highlighted text". Your output must begin with the first word of the result itself
             """
         case .fixGrammar:
             return """
             Fix only the grammar, spelling, and punctuation in the following text. Do NOT change the wording, tone, or style.
             Rules:
+            - If the text has no grammar, spelling, or punctuation errors, return it exactly as-is, unchanged
             - Correct grammar, spelling, and punctuation errors only
-            - Keep the original wording as close as possible
-            - Do not rephrase, restructure, or change the tone
+            - Keep every word, clause, and sentence — never remove, merge, or shorten any part of the text
+            - Preserve the original length; the output must have roughly the same number of words as the input
+            - Preserve capitalization, including ALL CAPS words used for emphasis (e.g. "NO" stays "NO")
+            - If the text contains a question, do NOT answer it — preserve the question exactly as written
+            - Do not summarize, paraphrase, simplify, or collapse multi-clause answers
+            - Do not rephrase, restructure, reorder, or change the tone
             - Maintain the same language as the input
             - Return ONLY the corrected text with no explanation or preamble
             """
@@ -121,11 +138,14 @@ enum RephraseMode: Identifiable, Hashable, Codable {
             Rules:
             - Replace hedging language (maybe, I think, perhaps, kind of) with direct statements
             - Use active voice and strong verbs
+            - Preserve every sentence and clause — if the input has 3 sentences, the output has 3 sentences. Do not merge, split, or drop sentences
+            - If the text contains a question, rephrase it as a question — do not answer it
+            - Preserve ALL CAPS words used for emphasis (e.g. "NO" stays "NO")
             - Keep the same meaning and intent
             - Maintain the same language as the input
             - Fix any grammar or spelling errors
             - Do not change the core message or add new information
-            - Return ONLY the rephrased text with no explanation or preamble
+            - Do not include any introduction, preface, or meta-commentary. Do not reference "the text", "the input", "the message", or "the highlighted text". Your output must begin with the first word of the result itself
             """
         case .empathetic:
             return """
@@ -133,11 +153,14 @@ enum RephraseMode: Identifiable, Hashable, Codable {
             Rules:
             - Acknowledge feelings and perspectives where appropriate
             - Use gentle, supportive language
+            - Preserve every sentence and clause — if the input has 3 sentences, the output has 3 sentences. Do not merge, split, or drop sentences
+            - If the text contains a question, rephrase it as a question — do not answer it
+            - Preserve ALL CAPS words used for emphasis (e.g. "NO" stays "NO")
             - Keep the same meaning and intent
             - Maintain the same language as the input
             - Fix any grammar or spelling errors
             - Do not change the core message or add new information
-            - Return ONLY the rephrased text with no explanation or preamble
+            - Do not include any introduction, preface, or meta-commentary. Do not reference "the text", "the input", "the message", or "the highlighted text". Your output must begin with the first word of the result itself
             """
         case .summarize:
             return """
@@ -148,7 +171,7 @@ enum RephraseMode: Identifiable, Hashable, Codable {
             - Maintain the same language as the input
             - Use clear, simple language
             - Do not add interpretation or opinion
-            - Return ONLY the summary with no explanation or preamble
+            - Do not include any introduction, preface, or meta-commentary. Do not reference "the text", "the input", "the message", or "the highlighted text". Your output must begin with the first word of the summary itself
             """
         case .keyPoints:
             return """
@@ -159,7 +182,7 @@ enum RephraseMode: Identifiable, Hashable, Codable {
             - Capture all important information
             - Maintain the same language as the input
             - Order points by importance
-            - Return ONLY the bulleted list with no explanation or preamble
+            - Do not include any introduction, preface, or meta-commentary. Do not reference "the text", "the input", "the message", or "the highlighted text". Your output must begin directly with the first bullet
             """
         case .custom(let mode):
             return mode.prompt

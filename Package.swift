@@ -7,7 +7,8 @@ let package = Package(
         .macOS(.v14)
     ],
     products: [
-        .executable(name: "Rephraser", targets: ["Rephraser"])
+        .executable(name: "Rephraser", targets: ["Rephraser"]),
+        .executable(name: "rephraser-qa", targets: ["rephraser-qa"]),
     ],
     dependencies: [
         .package(url: "https://github.com/soffes/HotKey", from: "0.2.0"),
@@ -33,6 +34,17 @@ let package = Package(
             linkerSettings: [
                 .unsafeFlags(["-Xlinker", "-rpath", "-Xlinker", "@executable_path/../Frameworks"])
             ]
-        )
+        ),
+        .executableTarget(
+            name: "rephraser-qa",
+            dependencies: [
+                .product(name: "MLXLLM", package: "mlx-swift-lm"),
+                .product(name: "MLXLMCommon", package: "mlx-swift-lm"),
+            ],
+            path: "qa-cli",
+            swiftSettings: [
+                .swiftLanguageMode(.v5)
+            ]
+        ),
     ]
 )

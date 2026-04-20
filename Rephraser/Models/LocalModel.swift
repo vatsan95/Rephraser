@@ -17,21 +17,29 @@ struct LocalModel: Identifiable, Hashable, Codable {
 enum ModelCatalog {
     static let all: [LocalModel] = [
         LocalModel(
-            id: "gemma-3-1b-qat-4bit",
-            name: "Gemma 3 1B",
-            huggingFaceID: "mlx-community/gemma-3-1b-it-qat-4bit",
-            sizeDescription: "~0.8 GB",
-            parameterCount: "1B",
-            description: "Google's Gemma 3 -- fast download, great for quick rephrasing",
+            id: "phi-4-mini-4bit",
+            name: "Phi-4 Mini",
+            huggingFaceID: "mlx-community/phi-4-mini-instruct-4bit",
+            sizeDescription: "~2.3 GB",
+            parameterCount: "3.8B",
+            description: "Microsoft's Phi-4 Mini -- best instruction-following, recommended",
             isRecommended: true
         ),
         LocalModel(
-            id: "gemma-3-4b-it-4bit",
-            name: "Gemma 3 4B",
-            huggingFaceID: "mlx-community/gemma-3-4b-it-4bit",
-            sizeDescription: "~2.5 GB",
-            parameterCount: "4B",
-            description: "Google's Gemma 3 -- best quality for rephrasing"
+            id: "gemma-3-1b-qat-4bit",
+            name: "Gemma 3 1B (Lite)",
+            huggingFaceID: "mlx-community/gemma-3-1b-it-qat-4bit",
+            sizeDescription: "~0.8 GB",
+            parameterCount: "1B",
+            description: "Google's Gemma 3 -- smallest download, best for short single-sentence rephrases"
+        ),
+        LocalModel(
+            id: "llama-3.2-3b-4bit",
+            name: "Llama 3.2 3B",
+            huggingFaceID: "mlx-community/Llama-3.2-3B-Instruct-4bit",
+            sizeDescription: "~1.8 GB",
+            parameterCount: "3B",
+            description: "Meta's Llama 3.2 -- balanced size and quality"
         ),
         LocalModel(
             id: "qwen3-4b-4bit",
@@ -40,22 +48,6 @@ enum ModelCatalog {
             sizeDescription: "~2.5 GB",
             parameterCount: "4B",
             description: "Alibaba's Qwen 3 -- strong multilingual support"
-        ),
-        LocalModel(
-            id: "phi-4-mini-4bit",
-            name: "Phi-4 Mini",
-            huggingFaceID: "mlx-community/phi-4-mini-instruct-4bit",
-            sizeDescription: "~2.3 GB",
-            parameterCount: "3.8B",
-            description: "Microsoft's Phi-4 Mini -- compact and efficient"
-        ),
-        LocalModel(
-            id: "llama-3.2-3b-4bit",
-            name: "Llama 3.2 3B",
-            huggingFaceID: "mlx-community/Llama-3.2-3B-Instruct-4bit",
-            sizeDescription: "~1.8 GB",
-            parameterCount: "3B",
-            description: "Meta's Llama 3.2 -- smallest option, fastest speed"
         ),
     ]
 
